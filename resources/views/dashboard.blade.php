@@ -1,6 +1,51 @@
 @extends("layout.main")
 
 @section("content")
+<h1 class="mt-3">Dashboard</h1>
+<hr>
+<div class="row mt-3">
+  <div class='card col-md-3 bg-info'>
+    <div class='card-body'>
+      <div class="inner">
+        <h3>150</h3>
+        <p>New Orders</p>
+      </div>
+      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+  </div>
+
+  <div class='card col-md-3 bg-info'>
+    <div class='card-body'>
+      <div class="inner">
+        <h3>150</h3>
+        <p>New Orders</p>
+      </div>
+      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+  </div>
+
+  <div class='card col-md-3 bg-info'>
+    <div class='card-body'>
+      <div class="inner">
+        <h3>150</h3>
+        <p>New Orders</p>
+      </div>
+      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+  </div>
+
+  <div class='card col-md-3 bg-info'>
+    <div class='card-body'>
+      <div class="inner">
+        <h3>150</h3>
+        <p>New Orders</p>
+      </div>
+      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+  </div>
+  
+</div>
+
 <h4 class="mt-4 text-center mb-4">MI AL-MA'ARIF MARGOMULYO 02</h4>
 <ol class="breadcrumb mb-4">
 <li class="fst-normal" style="text-align: justify; text-indent: 50px; ">Madrasah Ibtidaiyah Al-Ma'arif Margomulyo 02 yang merupakan sekolah swasta di bawah naungan Yayasan BPPPMNU Cabang Kab. Blitar.

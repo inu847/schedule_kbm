@@ -86,7 +86,9 @@
             <td>{{ $kelas->id }}</td>
             <td>{{ $kelas->kelas }}</td>
             <td>{{ $kelas->jumlah_siswa }}</td>
-            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editKelas{{ $kelas->id }}">Edit</button> <a href="/data-kelas/delete/{{ $kelas->id }}" class="btn btn-danger">Hapus</a></td>
+            <td>
+              <button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editKelas{{ $kelas->id }}"><i class="fas fa-pencil-alt"></i></button>
+              <a href="/data-kelas/delete/{{ $kelas->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
         </tr>
     @endforeach
   </tbody>

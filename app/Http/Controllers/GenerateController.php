@@ -46,9 +46,9 @@ class GenerateController extends Controller
     }
 
     function delete($id){
-        $generate = DB::table('generate')
-        ->where('id', '=', $id)->delete();
-        return redirect('/generate');
+        $generate = Generate::find($id)->delete();
+        
+        return redirect()->back();
     }
 
     function store(Request $request)

@@ -89,7 +89,9 @@
             <td>{{ $waktu->id }}</td>
             <td>{{ $waktu->hari }}</td>
             <td>{{ $waktu->waktu }}</td>
-            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editwaktu{{ $waktu->id }}">Edit</button> <a href="/data-waktu/delete/{{ $waktu->id }}" class="btn btn-danger">Hapus</a></td>
+            <td>
+              <button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editwaktu{{ $waktu->id }}"><i class="fas fa-pencil-alt"></i></button>
+              <a href="/data-waktu/delete/{{ $waktu->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
         </tr>
     @endforeach
   </tbody>

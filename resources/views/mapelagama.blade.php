@@ -1,6 +1,10 @@
 @extends("layout.main")
 
 @section("content")
+@php
+  $durasi = [60, 30];
+@endphp
+
 <h4 class="mt-3"><i class="fa-solid fa-book-open-reader"></i> Data Mapel Agama</h4>
  <div class="card p-1 mt-1 ">
     <div class="card-body">
@@ -17,7 +21,7 @@
       </div>
       <div class="modal-body">
 
-      <form action="/mapel_agama/store" method="post">
+      <form action="/mapel-agama/store" method="post">
         @csrf
       <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Kode Mapel Agama</label>
@@ -38,7 +42,13 @@
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Durasi</label>
-    <input type="number" class="form-control" name="durasi">
+    <select name="durasi" id="" class="form-control">
+      <option value="" selected disabled>Pilih Opsi</option>
+      @foreach ($durasi as $item)
+        <option value="{{ $item }}">{{ $item }}</option>
+      @endforeach
+    </select>
+    {{-- <input type="number" class="form-control" name="durasi"> --}}
   </div>
       </div>
       <div class="modal-footer">
@@ -75,9 +85,16 @@
     <label for="exampleInputPassword1" class="form-label">Kelas</label>
     <input type="text" class="form-control" value="{{ $agama->kelas }}" name="kelas">
   </div>
+  
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Durasi</label>
-    <input type="number" class="form-control" value="{{ $agama->durasi }}" name="durasi">
+    <select name="durasi" id="" class="form-control">
+      <option value="" selected disabled>Pilih Opsi</option>
+      @foreach ($durasi as $item)
+        <option value="{{ $item }}" {{ ($agama->durasi == $item) ? 'selected' : '' }} >{{ $item }}</option>
+      @endforeach
+    </select>
+    {{-- <input type="number" class="form-control" value="{{ $agama->durasi }}" name="durasi"> --}}
   </div>
       </div>
       <div class="modal-footer">
@@ -113,7 +130,8 @@
             <td>{{ $agama->mapel }}</td>
             <td>{{ $agama->kelas }}</td>
             <td>{{ $agama->durasi }}</td>
-            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editAgama{{ $agama->id }}">Edit</button> <a href="/data-agama/delete/{{ $agama->id }}" class="btn btn-danger">Hapus</a></td>
+            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editAgama{{ $agama->id }}"><i class="fas fa-pencil-alt"></i></button>
+              <a href="/data-agama/delete/{{ $agama->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
         </tr>
     @endforeach
   </tbody>

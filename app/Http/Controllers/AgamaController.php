@@ -25,11 +25,12 @@ class AgamaController extends Controller
         return redirect('/mapel-agama');
     }
     function store(Request $request){
+        // dd($request->all());
         DB::table('mapelagama')->insert([
             'kode_agama' => $request->kode_agama,
             'mapel' => $request->mapel,
             'kelas' => $request->kelas,
-            'durasi' => $request->durasi,
+            'durasi' => (int)$request->durasi,
         ]);
         return redirect('/mapel-agama');
     }

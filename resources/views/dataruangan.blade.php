@@ -77,7 +77,8 @@
         <tr>
             <td>{{ $ruang->id }}</td>
             <td>{{ $ruang->ruang }}</td>
-            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editruang{{ $ruang->id }}">Edit</button> <a href="/data-ruangan/delete/{{ $ruang->id }}" class="btn btn-danger">Hapus</a></td>
+            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editruang{{ $ruang->id }}"><i class="fas fa-pencil-alt"></i></button>
+              <a href="/data-ruangan/delete/{{ $ruang->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
         </tr>
     @endforeach
   </tbody>

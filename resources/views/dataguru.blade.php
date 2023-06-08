@@ -22,7 +22,8 @@
         @csrf
   <div class="mb-3">
     <label for="exampleInputEmail1" class="form-label">Nama Guru</label>
-    <input type="text" class="form-control" name="nama_guru">
+    <small class="text-danger" id="message_input_guru" hidden>Invalid Input Only alphabet</small>
+    <input type="text" class="form-control" id="nama_guru" name="nama_guru">
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Jabatan</label>
@@ -33,13 +34,14 @@
     <label for="exampleInputPassword1" class="form-label">Mapel </label>
     <!-- pengambilan data dari mapel  -->
     <select class="form-select" name="mapel" aria-label="Default select example">
-    @foreach($mapel_umum as $mapel)
-  <option value="{{ $mapel->mapel }}"> Mapel Umum | {{ $mapel->mapel }} </option>
-  @endforeach
-  @foreach($mapel_agama as $mapel)
-  <option value="{{ $mapel->mapel }}">Mapel Agama | {{ $mapel->mapel }} </option>
-  @endforeach
-</select>
+      <option value="" selected disabled>Pilih Opsi</option>
+      @foreach($mapel_umum as $mapel)
+        <option value="{{ $mapel->mapel }}"> Mapel Umum | {{ $mapel->mapel }} </option>
+      @endforeach
+      @foreach($mapel_agama as $mapel)
+        <option value="{{ $mapel->mapel }}">Mapel Agama | {{ $mapel->mapel }} </option>
+      @endforeach
+  </select>
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Nomor HP </label>
@@ -48,7 +50,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="submit" class="btn btn-primary" id="save">Save changes</button>
       </div>
     </div>
   </div>
@@ -70,7 +72,8 @@
         <input type="hidden" value="{{ $guru->id }}" name="id">
   <div class="mb-3">
     <label for="exampleInputEmail1" class="form-label">Nama guru</label>
-    <input type="text" class="form-control" value="{{ $guru->nama_guru }}" name="nama_guru">
+    <small class="text-danger" id="message_input_guru_edit" hidden>Invalid Input Only alphabet</small>
+    <input type="text" class="form-control" id="nama_guru_edit" value="{{ $guru->nama_guru }}" name="nama_guru">
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">jabatan</label>
@@ -87,7 +90,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
+        <button type="submit" class="btn btn-primary" id="save_edit">Save changes</button>
       </div>
     </div>
   </div>
@@ -119,7 +122,9 @@
             <td>{{ $guru->jabatan }}</td>
             <td>{{ $guru->mapel }}</td>
             <td>{{ $guru->no_hp }}</td>
-            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editguru{{ $guru->id }}">Edit</button> <a href="/data-guru/delete/{{ $guru->id }}" class="btn btn-danger">Hapus</a></td>
+            <td>
+              <button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editguru{{ $guru->id }}"><i class="fas fa-pencil-alt"></i></button>
+              <a href="/data-guru/delete/{{ $guru->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
         </tr>
     @endforeach
   </tbody>
@@ -128,4 +133,45 @@
 </div>
 </div>
  </div>
+
+<script>
+  var inputField = document.getElementById("nama_guru");
+  inputField.addEventListener("input", validateInput);
+
+  function validateInput() {
+    var inputValue = inputField.value.trim();
+    
+    var regex = /^[a-zA-Z\s]*$/;
+    
+    if (regex.test(inputValue)) {
+      console.log("Valid input: " + inputValue);
+      document.getElementById("message_input_guru").setAttribute("hidden", "hidden");
+      document.getElementById("save").removeAttribute("disabled");
+    } else {
+      console.log("Invalid input: " + inputValue);
+      document.getElementById("message_input_guru").removeAttribute("hidden");
+      document.getElementById("save").setAttribute("disabled", "disabled");
+    }
+  }
+
+  var inputField = document.getElementById("nama_guru_edit");
+  inputField.addEventListener("input", validateInput);
+
+  function validateInput() {
+    var inputValue = inputField.value.trim();
+    
+    var regex = /^[a-zA-Z\s]*$/;
+    
+    if (regex.test(inputValue)) {
+      console.log("Valid input: " + inputValue);
+      document.getElementById("message_input_guru_edit").setAttribute("hidden", "hidden");
+      document.getElementById("save_edit").removeAttribute("disabled");
+    } else {
+      console.log("Invalid input: " + inputValue);
+      document.getElementById("message_input_guru_edit").removeAttribute("hidden");
+      document.getElementById("save_edit").setAttribute("disabled", "disabled");
+    }
+  }
+</script>
+
 @endsection

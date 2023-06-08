@@ -110,7 +110,11 @@
       <td>{{ $g->nama_guru }}</td>
       <td>{{ $g->hari.", ".$g->waktu }}</td>
       <td>
-      <a href="/generate/delete/{{ $g->id }}" class="btn btn-danger">Hapus</a>
+        <button class="btn btn-danger" onclick="deleteData({{ $g->id }})"><i class="fa-solid fa-trash"></i></button>
+        <form action="/generate/delete/{{ $g->id }}" method="post" id="delete{{ $g->id }}">
+          @csrf
+          <input type="hidden" name="_method" value="DELETE">
+        </form>
       </td>
     </tr>
     <?php $count++; ?>
@@ -119,6 +123,16 @@
 </table>
 </div>
 </div>
-
 </div>
+
+<script>
+  function deleteData(id) {
+    var result = confirm("Are you sure you want to delete this data?");
+    if (result === true) {
+      $('#delete'+id).submit();
+    } else {
+      console.log("Cancel Delete Data.");
+    }
+  }
+</script>
 @endsection

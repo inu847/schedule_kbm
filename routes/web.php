@@ -58,5 +58,5 @@ Route::post('/data-waktu/store', [WaktuController::class, 'store']);
 Route::post('/data-waktu/update', [WaktuController::class, 'update']);
 
 Route::get('/generate-jadwal', [GenerateController::class, 'index']);
-Route::get('/generate/delete/{id}', [GenerateController::class, 'delete']);
+Route::delete('/generate/delete/{id}', [GenerateController::class, 'delete']);
 Route::post('/generate/store', [GenerateController::class, 'store'])->name('generate.store');

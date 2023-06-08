@@ -1,6 +1,10 @@
 @extends("layout.main")
 
 @section("content")
+@php
+  $durasi = [60, 30];
+@endphp
+
 <h4 class="mt-3"><i class="fa-solid fa-book-open-reader"></i> Data Mapel Umum</h4>
  <div class="card p-1 mt-1 ">
     <div class="card-body">
@@ -37,7 +41,13 @@
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Durasi</label>
-    <input type="number" class="form-control" name="durasi">
+    <select name="durasi" id="" class="form-control">
+      <option value="" selected disabled>Pilih Opsi</option>
+      @foreach ($durasi as $item)
+        <option value="{{ $item }}">{{ $item }}</option>
+      @endforeach
+    </select>
+    {{-- <input type="number" class="form-control" name="durasi"> --}}
   </div>
       </div>
       <div class="modal-footer">
@@ -77,7 +87,13 @@
   </div>
   <div class="mb-3">
     <label for="exampleInputPassword1" class="form-label">Durasi</label>
-    <input type="number" class="form-control" value="{{ $umum->durasi }}" name="durasi">
+    <select name="durasi" id="" class="form-control">
+      <option value="" selected disabled>Pilih Opsi</option>
+      @foreach ($durasi as $item)
+        <option value="{{ $item }}" {{ ($agama->durasi == $item) ? 'selected' : '' }} >{{ $item }}</option>
+      @endforeach
+    </select>
+    {{-- <input type="number" class="form-control" value="{{ $umum->durasi }}" name="durasi"> --}}
   </div>
       </div>
       <div class="modal-footer">
@@ -113,7 +129,9 @@
             <td>{{ $umum->mapel }}</td>
             <td>{{ $umum->kelas }}</td>
             <td>{{ $umum->durasi }}</td>
-            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editumum{{ $umum->id }}">Edit</button> <a href="/data-umum/delete/{{ $umum->id }}" class="btn btn-danger">Hapus</a></td>
+            <td>
+              <button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editumum{{ $umum->id }}"><i class="fas fa-pencil-alt"></i></button>
+              <a href="/data-umum/delete/{{ $umum->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
         
           </tr>
     @endforeach
