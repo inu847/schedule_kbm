@@ -1,142 +1,161 @@
-@extends("layout.main")
+@extends("layout.main2")
+
+@section("title", "Data Mapel Agama")
 
 @section("content")
 @php
   $durasi = [60, 30];
 @endphp
 
-<h4 class="mt-3"><i class="fa-solid fa-book-open-reader"></i> Data Mapel Agama</h4>
- <div class="card p-1 mt-1 ">
-    <div class="card-body">
-
-    <!-- modal tambah data -->
-    <button class="btn btn-dark float-end"data-bs-toggle="modal" data-bs-target="#tambahagama"><i class="fa-solid fa-plus"></i> Tambah Data</button>
-    </div>
-    <div class="modal fade" id="tambahagama" tabindex="-1" aria-labelledby="tambahagamaLabel" aria-hidden="true">
+{{-- Modal Tambah --}}
+<div class="modal fade" id="modal-default">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="tambahagamaLabel">Masukan Data Mapel Agama</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">Tambah Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-      <div class="modal-body">
-
       <form action="/mapel-agama/store" method="post">
         @csrf
-      <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Kode Mapel Agama</label>
-    <input type="text" class="form-control" name="kode_agama">
-  </div>
-      <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">Mapel</label>
-    <input type="text" class="form-control" name="mapel">
-  </div>
-  <div class="mb-3">
-<!-- pengambilan data -->
-    <label for="exampleInputEmail1" class="form-label">Kelas</label>
-    <select class="form-select" name="kelas" aria-label="Default select example">
-    @foreach($data_kelas as $kelas)
-  <option value="{{ $kelas->kelas }}">  {{ $kelas->kelas }} </option>
-  @endforeach
-</select>
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Durasi</label>
-    <select name="durasi" id="" class="form-control">
-      <option value="" selected disabled>Pilih Opsi</option>
-      @foreach ($durasi as $item)
-        <option value="{{ $item }}">{{ $item }}</option>
-      @endforeach
-    </select>
-    {{-- <input type="number" class="form-control" name="durasi"> --}}
-  </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
-      </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Kode Mapel Agama</label>
+            <input type="text" class="form-control" name="kode_agama">
+          </div>
+          <div class="form-group">
+            <label>Mapel</label>
+            <input type="text" class="form-control" name="mapel">
+          </div>
+          <div class="form-group">
+            <label>Kelas</label>
+            <select class="form-control select2" name="kelas" aria-label="Default select example">
+              @foreach($data_kelas as $kelas)
+                <option value="{{ $kelas->kelas }}">  {{ $kelas->kelas }} </option>
+                @endforeach
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Durasi</label>
+            <select name="durasi" id="" class="form-control select2">
+              <option value="" selected disabled>Pilih Opsi</option>
+              @foreach ($durasi as $item)
+                <option value="{{ $item }}">{{ $item }}</option>
+              @endforeach
+            </select>
+            {{-- <input type="number" class="form-control" name="durasi"> --}}
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-</form>
 
 <!-- Modal Edit -->
 @foreach($semua_agama as $agama)
-<div class="modal fade" id="editAgama{{ $agama->id }}" tabindex="-1" aria-labelledby="editAgama{{ $agama->id }}Label" aria-hidden="true">
+<div class="modal fade" id="editAgama{{ $agama->id }}">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="editagama{{ $agama->id }}Label">Edit Data agama</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">Edit Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-      <div class="modal-body">
       <form action="/mapel-agama/update" method="post">
         @csrf
-        <input type="hidden" value="{{ $agama->id }}" name="id">
-  <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">Kode agama</label>
-    <input type="text" class="form-control" value="{{ $agama->kode_agama }}" name="agama">
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Mapel</label>
-    <input type="text" class="form-control" value="{{ $agama->mapel }}" name="mapel">
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Kelas</label>
-    <input type="text" class="form-control" value="{{ $agama->kelas }}" name="kelas">
-  </div>
-  
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Durasi</label>
-    <select name="durasi" id="" class="form-control">
-      <option value="" selected disabled>Pilih Opsi</option>
-      @foreach ($durasi as $item)
-        <option value="{{ $item }}" {{ ($agama->durasi == $item) ? 'selected' : '' }} >{{ $item }}</option>
-      @endforeach
-    </select>
-    {{-- <input type="number" class="form-control" value="{{ $agama->durasi }}" name="durasi"> --}}
-  </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Save changes</button>
-      </div>
+        <div class="modal-body">
+          <input type="hidden" value="{{ $agama->id }}" name="id">
+          <div class="form-group">
+            <label>Kode agama</label>
+            <input type="text" class="form-control" value="{{ $agama->kode_agama }}" name="agama">
+          </div>
+          <div class="form-group">
+            <label>Mapel</label>
+            <input type="text" class="form-control" value="{{ $agama->mapel }}" name="mapel">
+          </div>
+          <div class="form-group">
+            <label>Kelas</label>
+            <select class="form-control select2" name="kelas" aria-label="Default select example">
+              @foreach($data_kelas as $kelas)
+                <option value="{{ $kelas->kelas }}" {{ ($kelas->kelas == $agama->kelas) ? 'selected' : '' }}>{{ $kelas->kelas }} </option>
+                @endforeach
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Durasi</label>
+            <select name="durasi" id="" class="form-control select2">
+              <option value="" selected disabled>Pilih Opsi</option>
+              @foreach ($durasi as $item)
+                <option value="{{ $item }}" {{ ($agama->durasi == $item) ? 'selected' : '' }} >{{ $item }}</option>
+              @endforeach
+            </select>
+            {{-- <input type="number" class="form-control" value="{{ $agama->durasi }}" name="durasi"> --}}
+          </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-</form>
 @endforeach
 
-
-
-<div class= "card p-1 mt-1">
-<div>
-<table  class="table tabel-data table-striped table-bordered" width="100%" cellspacing="0">
-  <thead>
-    <tr>
-      <th scope="col">No</th>
-      <th scope="col">Kode Mapel</th>
-      <th scope="col">Mapel</th>
-      <th scope="col">Kelas</th>
-      <th scope="col">Durasi (Menit)</th>
-      <th scope="col">Aksi</th>
-    </tr>
-  </thead>
-  <tbody>
-  @foreach($semua_agama as $agama)
+<div class='card'>
+  <div class='card-header'>
+    <h3 class="float-left">Data Mapel Agama</h3>
+    <div class="float-right">
+      <button class="btn btn-dark float-end" data-toggle="modal" data-target="#modal-default"><i class="fa-solid fa-plus"></i> Tambah Data</button>
+    </div>
+  </div>
+  <div class='card-body'>
+    <table class="table tabel-data table-striped table-bordered" id="example1" width="100%" cellspacing="0">
+      <thead>
         <tr>
-            <td>{{ $agama->id }}</td>
-            <td>{{ $agama->kode_agama }}</td>
-            <td>{{ $agama->mapel }}</td>
-            <td>{{ $agama->kelas }}</td>
-            <td>{{ $agama->durasi }}</td>
-            <td><button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editAgama{{ $agama->id }}"><i class="fas fa-pencil-alt"></i></button>
-              <a href="/data-agama/delete/{{ $agama->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
+          <th scope="col">No</th>
+          <th scope="col">Kode Mapel</th>
+          <th scope="col">Mapel</th>
+          <th scope="col">Kelas</th>
+          <th scope="col">Durasi (Menit)</th>
+          <th scope="col">Aksi</th>
         </tr>
-    @endforeach
-  </tbody>
-</table>
+      </thead>
+      <tbody>
+      @foreach($semua_agama as $agama)
+            <tr>
+                <td>{{ $agama->id }}</td>
+                <td>{{ $agama->kode_agama }}</td>
+                <td>{{ $agama->mapel }}</td>
+                <td>{{ $agama->kelas }}</td>
+                <td>{{ $agama->durasi }}</td>
+                <td><button type="button" class="btn btn-warning"  data-toggle="modal" data-target="#editAgama{{ $agama->id }}"><i class="fas fa-pencil-alt"></i></button>
+                  <button class="btn btn-danger" onclick="deleteData({{ $agama->id }})"><i class="fa-solid fa-trash"></i></button>
+                  <form action="/mapel-agama/delete/{{ $agama->id }}" method="post" id="delete{{ $agama->id }}">
+                    @csrf
+                    <input type="hidden" name="_method" value="DELETE">
+                  </form>
+            </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
 </div>
-</div>
- </div>
+
+ <script>
+  function deleteData(id) {
+    var result = confirm("Are you sure you want to delete this data?");
+    if (result === true) {
+      $('#delete'+id).submit();
+    } else {
+      console.log("Cancel Delete Data.");
+    }
+  }
+</script>
 @endsection

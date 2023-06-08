@@ -1,145 +1,160 @@
-@extends("layout.main")
+@extends("layout.main2")
+
+@section('title', 'Data Guru')
 
 @section("content")
-<h4 class="mt-3"><i class="fa-solid fa-chalkboard-user"></i> Data Guru</h4>
- <div class="card p-1 mt-1 ">
-    <div class="card-body">
 
-<!-- modal tambah data -->
-
-        <button class="btn btn-dark float-end" data-bs-toggle="modal" data-bs-target="#tambahguru"><i class="fa-solid fa-plus"></i> Tambah Data</button>
-    </div>
-    <div class="modal fade" id="tambahguru" tabindex="-1" aria-labelledby="tambahguruLabel" aria-hidden="true">
+{{-- Tambah Data --}}
+<div class="modal fade" id="modal-default">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h1 class="modal-title fs-5" id="tambahguruLabel">Masukan Data Guru</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <h4 class="modal-title">Tambah Data</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
       <div class="modal-body">
-        
-      <form action="/data-guru/store" method="post">
-        @csrf
-  <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">Nama Guru</label>
-    <small class="text-danger" id="message_input_guru" hidden>Invalid Input Only alphabet</small>
-    <input type="text" class="form-control" id="nama_guru" name="nama_guru">
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Jabatan</label>
-    <input type="text" class="form-control" name="jabatan">
-  </div>
-  <div class="mb-3">
-    
-    <label for="exampleInputPassword1" class="form-label">Mapel </label>
-    <!-- pengambilan data dari mapel  -->
-    <select class="form-select" name="mapel" aria-label="Default select example">
-      <option value="" selected disabled>Pilih Opsi</option>
-      @foreach($mapel_umum as $mapel)
-        <option value="{{ $mapel->mapel }}"> Mapel Umum | {{ $mapel->mapel }} </option>
-      @endforeach
-      @foreach($mapel_agama as $mapel)
-        <option value="{{ $mapel->mapel }}">Mapel Agama | {{ $mapel->mapel }} </option>
-      @endforeach
-  </select>
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Nomor HP </label>
-    <input type="number" class="form-control" name="no_hp">
-  </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="save">Save changes</button>
-      </div>
+        <form action="/data-guru/store" method="post">
+          @csrf
+            <div class="form-group">
+              <label>Nama Guru</label>
+              <small class="text-danger" id="message_input_guru" hidden>Invalid Input Only alphabet</small>
+              <input type="text" class="form-control" id="nama_guru" name="nama_guru">
+            </div>
+            <div class="form-group">
+              <label>Jabatan</label>
+              <input type="text" class="form-control" name="jabatan">
+            </div>
+            <div class="form-group">
+              <label>Mapel </label>
+              <!-- pengambilan data dari mapel  -->
+              <select class="form-control select2" name="mapel" aria-label="Default select example">
+                <option value="" selected disabled>Pilih Opsi</option>
+                @foreach($mapel_umum as $mapel)
+                  <option value="{{ $mapel->mapel }}"> Mapel Umum | {{ $mapel->mapel }} </option>
+                @endforeach
+                @foreach($mapel_agama as $mapel)
+                  <option value="{{ $mapel->mapel }}">Mapel Agama | {{ $mapel->mapel }} </option>
+                @endforeach
+            </select>
+            </div>
+            <div class="form-group">
+              <label>Nomor HP </label>
+              <input type="number" class="form-control" name="no_hp">
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="save">Submit</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
-</form>
 
 <!-- Modal Edit -->
-@foreach($semua_guru as $guru)
-<div class="modal fade" id="editguru{{ $guru->id }}" tabindex="-1" aria-labelledby="editguru{{ $guru->id }}Label" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="editguru{{ $guru->id }}Label">Edit Data guru</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-      <form action="/data-guru/update" method="post">
-        @csrf
-        <input type="hidden" value="{{ $guru->id }}" name="id">
-  <div class="mb-3">
-    <label for="exampleInputEmail1" class="form-label">Nama guru</label>
-    <small class="text-danger" id="message_input_guru_edit" hidden>Invalid Input Only alphabet</small>
-    <input type="text" class="form-control" id="nama_guru_edit" value="{{ $guru->nama_guru }}" name="nama_guru">
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">jabatan</label>
-    <input type="text" class="form-control" value="{{ $guru->jabatan }}" name="jabatan">
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Mapel</label>
-    <input type="text" class="form-control" value="{{ $guru->mapel }}" name="mapel">
-  </div>
-  <div class="mb-3">
-    <label for="exampleInputPassword1" class="form-label">Nomor HP</label>
-    <input type="number" class="form-control" value="{{ $guru->no_hp }}" name="no_hp">
-  </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" id="save_edit">Save changes</button>
+@foreach ($semua_guru as $guru)
+  <div class="modal fade" id="editguru{{ $guru->id }}">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Edit Data</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form action="/data-guru/update" method="post">
+            @csrf
+            <input type="hidden" value="{{ $guru->id }}" name="id">
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Nama guru</label>
+              <small class="text-danger" id="message_input_guru_edit" hidden>Invalid Input Only alphabet</small>
+              <input type="text" class="form-control" id="nama_guru_edit" value="{{ $guru->nama_guru }}" name="nama_guru">
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">jabatan</label>
+              <input type="text" class="form-control" value="{{ $guru->jabatan }}" name="jabatan">
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Mapel</label>
+              <input type="text" class="form-control" value="{{ $guru->mapel }}" name="mapel">
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Nomor HP</label>
+              <input type="number" class="form-control" value="{{ $guru->no_hp }}" name="no_hp">
+            </div>
+        </div>
+        <div class="modal-footer justify-content-between">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="save_edit">Submit</button>
+        </div>
+        </form>
       </div>
     </div>
   </div>
-</div>
-</form>
 @endforeach
 
-
-
-<div class= "p-1 mt-1">
-<div>
-
-<table class="table tabel-data table-striped table-bordered" width="100%" cellspacing="0">
-  <thead>
-    <tr>
-      <th scope="col">No</th>
-      <th scope="col">Nama Guru</th>
-      <th scope="col">Jabatan</th>
-      <th scope="col">Mapel</th>
-      <th scope="col">Nomor HP</th>
-      <th scope="col">Aksi</th>
-    </tr>
-  </thead>
-  <tbody>
-    @foreach($semua_guru as $guru)
+<div class='card'>
+  <div class='card-header'>
+    <h3 class="float-left">Data Guru</h3>
+    <div class="float-right">
+      <button class="btn btn-dark float-end" data-toggle="modal" data-target="#modal-default"><i class="fa-solid fa-plus"></i> Tambah Data</button>
+    </div>
+  </div>
+  <div class='card-body'>
+    <table class="table tabel-data table-striped table-bordered" id="example1" width="100%" cellspacing="0">
+      <thead>
         <tr>
-            <td>{{ $guru->id }}</td>
-            <td>{{ $guru->nama_guru }}</td>
-            <td>{{ $guru->jabatan }}</td>
-            <td>{{ $guru->mapel }}</td>
-            <td>{{ $guru->no_hp }}</td>
-            <td>
-              <button type="button" class="btn btn-warning"  data-bs-toggle="modal" data-bs-target="#editguru{{ $guru->id }}"><i class="fas fa-pencil-alt"></i></button>
-              <a href="/data-guru/delete/{{ $guru->id }}" class="btn btn-danger"><i class="fas fa-trash"></i></a></td>
+          <th scope="col">No</th>
+          <th scope="col">Nama Guru</th>
+          <th scope="col">Jabatan</th>
+          <th scope="col">Mapel</th>
+          <th scope="col">Nomor HP</th>
+          <th scope="col">Aksi</th>
         </tr>
-    @endforeach
-  </tbody>
-</table>
-
+      </thead>
+      <tbody>
+        @foreach($semua_guru as $guru)
+            <tr>
+                <td>{{ $guru->id }}</td>
+                <td>{{ $guru->nama_guru }}</td>
+                <td>{{ $guru->jabatan }}</td>
+                <td>{{ $guru->mapel }}</td>
+                <td>{{ $guru->no_hp }}</td>
+                <td>
+                  <button type="button" class="btn btn-warning"  data-toggle="modal" data-target="#editguru{{ $guru->id }}"><i class="fas fa-pencil-alt"></i></button>
+                  <button class="btn btn-danger" onclick="deleteData({{ $guru->id }})"><i class="fa-solid fa-trash"></i></button>
+                  <form action="/data-guru/delete/{{ $guru->id }}" method="post" id="delete{{ $guru->id }}">
+                    @csrf
+                    <input type="hidden" name="_method" value="DELETE">
+                  </form>
+            </tr>
+        @endforeach
+      </tbody>
+    </table>
+  </div>
 </div>
-</div>
- </div>
 
+<script src="{{ asset('template2/plugins/jquery/jquery.min.js')}}"></script>
 <script>
-  var inputField = document.getElementById("nama_guru");
-  inputField.addEventListener("input", validateInput);
+  $(document).ready(function() {
+    // var inputField = $("#nama_guru");
+    // inputField.addEventListener("input", validateInput);
+    $('#nama_guru').on('input', function() {
+      validateInput();
+    });
 
+    // var inputField = $("#nama_guru_edit");
+    // inputField.addEventListener("input", validateInputEdit);
+    $('#nama_guru_edit').on('input', function() {
+      validateInputEdit();
+    });
+  });
+  
   function validateInput() {
-    var inputValue = inputField.value.trim();
+    var inputValue = $('#nama_guru').val().trim();
     
     var regex = /^[a-zA-Z\s]*$/;
     
@@ -154,11 +169,8 @@
     }
   }
 
-  var inputField = document.getElementById("nama_guru_edit");
-  inputField.addEventListener("input", validateInput);
-
-  function validateInput() {
-    var inputValue = inputField.value.trim();
+  function validateInputEdit() {
+    var inputValue = $('#nama_guru_edit').val().trim();
     
     var regex = /^[a-zA-Z\s]*$/;
     
@@ -170,6 +182,16 @@
       console.log("Invalid input: " + inputValue);
       document.getElementById("message_input_guru_edit").removeAttribute("hidden");
       document.getElementById("save_edit").setAttribute("disabled", "disabled");
+    }
+  }
+</script>
+<script>
+  function deleteData(id) {
+    var result = confirm("Are you sure you want to delete this data?");
+    if (result === true) {
+      $('#delete'+id).submit();
+    } else {
+      console.log("Cancel Delete Data.");
     }
   }
 </script>
