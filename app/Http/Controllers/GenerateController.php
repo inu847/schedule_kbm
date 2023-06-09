@@ -199,7 +199,17 @@ class GenerateController extends Controller
             }
         }
 
-        // dd($data);
+        foreach ($data as $key => $value) {
+            $time_end = explode('-', $value['waktu'])[1];
+            $time_now = Carbon::parse($time_end);
+            
+            if ($end_kbm <= $time_now) {
+                $time_now = Carbon::parse('07:00:00');
+                $waktu_mulai = Carbon::parse('07:00:00');
+                $waktu_selesai = Carbon::parse('07:00:00');
+                break;
+            }
+        }
         return $data;
     }
 

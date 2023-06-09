@@ -94,6 +94,17 @@
             <p>Generate Jadwal</p>
           </a>
         </li>
+        <li class="nav-item">
+          <a href="{{ route('logout') }}"
+              onclick="event.preventDefault();
+              document.getElementById('logout-form').submit();" class="nav-link">
+            <i class="fas fa-right-from-bracket nav-icon"></i>
+            <p>Logout</p>
+          </a>
+        </li>
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+          @csrf
+        </form>
       </ul>
     </nav>
     <!-- /.sidebar-menu -->
