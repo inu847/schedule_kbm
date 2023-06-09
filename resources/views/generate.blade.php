@@ -3,6 +3,17 @@
 @section('title', 'Generate Jadwal')
 
 @section("content")
+@php
+  $dayOfWeek = [
+      'Senin',
+      'Selasa',
+      'Rabu',
+      'Kamis',
+      'Jumat',
+      'Sabtu'
+  ];
+@endphp
+
   <div class="modal fade" id="modal-default">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -17,7 +28,7 @@
             @csrf
               <div class="form-group">
                 <label>Mapel</label>
-                <select name="kode_mapel" class="form-control select2" style="width: 100%;">
+                <select name="kode_mapel" style="padding: 10px 0px;" class="form-control select2" style="width: 100%;">
                   <option selected>Pilih Mapel</option>
                   @foreach($mapel_umum as $mapel)
                     <option value="{{ $mapel->kode_umum }}">Mapel Umum | {{ $mapel->mapel }}</option>
@@ -57,7 +68,13 @@
 
               <div class="form-group">
                 <label>Hari</label>
-                <input type="text" class="form-control" name="hari">
+                <select name="ruang" class="form-control select2" aria-label="Default select example">
+                  <option selected>Pilih Hari</option>
+                  @foreach($dayOfWeek as $day)
+                    <option value="{{ $day }}">{{ $day }}</option>
+                  @endforeach
+                </select>
+                {{-- <input type="text" class="form-control" name="hari"> --}}
               </div>
               <div class="form-group">
                 <label>Waktu</label>

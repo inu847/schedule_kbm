@@ -5,6 +5,7 @@ use App\Http\Controllers\GuruController;
 use App\Http\Controllers\KelasController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\AgamaController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UmumController;
 use App\Http\Controllers\WaktuController;
 use App\Http\Controllers\GenerateController;
@@ -25,9 +26,10 @@ Route::get('/login', function () {
 });
 
 Route::get('/', function () {
-    return view('dashboard');
-})->name('dashboard');
+    return redirect()->route('dashboard');
+});
 
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 Route::get('/data-guru', [GuruController::class, 'index'])->name('data-guru.index');
 Route::delete('/data-guru/delete/{id}', [GuruController::class, 'delete']);
 Route::post('/data-guru/store', [GuruController::class, 'store']);

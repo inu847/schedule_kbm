@@ -19,7 +19,7 @@
           @csrf
             <div class="form-group">
               <label>Nama Guru</label>
-              <small class="text-danger" id="message_input_guru" hidden>Invalid Input Only alphabet</small>
+              <small class="text-danger" id="message_input_guru" hidden>Hanya Huruf Alfabet</small>
               <input type="text" class="form-control" id="nama_guru" name="nama_guru">
             </div>
             <div class="form-group">
@@ -70,7 +70,7 @@
             <input type="hidden" value="{{ $guru->id }}" name="id">
             <div class="mb-3">
               <label for="exampleInputEmail1" class="form-label">Nama guru</label>
-              <small class="text-danger" id="message_input_guru_edit" hidden>Invalid Input Only alphabet</small>
+              <small class="text-danger" id="message_input_guru_edit" hidden>Hanya Huruf Alfabet</small>
               <input type="text" class="form-control" id="nama_guru_edit" value="{{ $guru->nama_guru }}" name="nama_guru">
             </div>
             <div class="mb-3">

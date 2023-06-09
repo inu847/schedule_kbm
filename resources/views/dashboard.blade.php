@@ -11,14 +11,14 @@
     <!-- small box -->
     <div class="small-box bg-info">
       <div class="inner">
-        <h3>150</h3>
+        <h3>{{ $data_kelas }}</h3>
 
-        <p>New Orders</p>
+        <p>Data Kelas</p>
       </div>
       <div class="icon">
         <i class="ion ion-bag"></i>
       </div>
-      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ route('data-kelas.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->
@@ -26,14 +26,14 @@
     <!-- small box -->
     <div class="small-box bg-success">
       <div class="inner">
-        <h3>53<sup style="font-size: 20px">%</sup></h3>
+        <h3>{{ $mapel_umum }}</h3>
 
-        <p>Bounce Rate</p>
+        <p>Data Mapel Umum</p>
       </div>
       <div class="icon">
         <i class="ion ion-stats-bars"></i>
       </div>
-      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ route('mapel-umum.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->
@@ -41,29 +41,71 @@
     <!-- small box -->
     <div class="small-box bg-warning">
       <div class="inner">
-        <h3>44</h3>
+        <h3>{{ $mapel_agama }}</h3>
 
-        <p>User Registrations</p>
+        <p>Data Mapel Agama</p>
       </div>
       <div class="icon">
         <i class="ion ion-person-add"></i>
       </div>
-      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ route('mapel-agama.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->
   <div class="col-lg-3 col-6">
     <!-- small box -->
-    <div class="small-box bg-danger">
+    <div class="small-box bg-info">
       <div class="inner">
-        <h3>65</h3>
+        <h3>{{ $data_guru }}</h3>
 
-        <p>Unique Visitors</p>
+        <p>Data Guru</p>
       </div>
       <div class="icon">
         <i class="ion ion-pie-graph"></i>
       </div>
-      <a href="#" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+      <a href="{{ route('data-guru.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+  </div>
+  <div class="col-lg-3 col-6">
+    <!-- small box -->
+    <div class="small-box bg-success">
+      <div class="inner">
+        <h3>{{ $data_ruangan }}</h3>
+
+        <p>Data Ruangan</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-pie-graph"></i>
+      </div>
+      <a href="{{ route('data-ruangan.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+  </div>
+  <div class="col-lg-3 col-6">
+    <!-- small box -->
+    <div class="small-box bg-warning">
+      <div class="inner">
+        <h3>{{ $waktu }}</h3>
+
+        <p>Data Waktu Tidak Tersedia</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-pie-graph"></i>
+      </div>
+      <a href="{{ route('data-waktu.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
+    </div>
+  </div>
+  <div class="col-lg-3 col-6">
+    <!-- small box -->
+    <div class="small-box bg-danger">
+      <div class="inner">
+        <h3>{{ $generate }}</h3>
+
+        <p>Data Generate Jadwal</p>
+      </div>
+      <div class="icon">
+        <i class="ion ion-pie-graph"></i>
+      </div>
+      <a href="{{ route('generate-jadwal.index') }}" class="small-box-footer">More info <i class="fas fa-arrow-circle-right"></i></a>
     </div>
   </div>
   <!-- ./col -->

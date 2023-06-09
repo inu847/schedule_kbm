@@ -35,9 +35,14 @@
               @endforeach
             </select>
           </div>
-          <div class="form-group">
+          {{-- <div class="form-group">
             <label>Waktu Tidak Tersedia</label>
             <input type="text" class="form-control" name="waktu" >
+          </div> --}}
+          <div class="form-group">
+            <label>Waktu:</label>
+            <input type="text" class="form-control" name="waktu" data-inputmask-alias="datetime" data-inputmask-inputformat="HH:MM - HH:MM" data-mask>
+            <!-- /.input group -->
           </div>
         </div>
         <div class="modal-footer justify-content-between">
@@ -73,9 +78,14 @@
               @endforeach
             </select>
           </div>
-          <div class="form-group">
+          {{-- <div class="form-group">
             <label>Waktu</label>
             <input type="text" class="form-control" value="{{ $waktu->waktu }}" name="waktu">
+          </div> --}}
+          <div class="form-group">
+            <label>Waktu:</label>
+            <input type="text" class="form-control" value="{{ $waktu->waktu }}" name="waktu" data-inputmask-alias="datetime" data-inputmask-inputformat="HH:MM - HH:MM" data-mask>
+            <!-- /.input group -->
           </div>
         </div>
         <div class="modal-footer justify-content-between">

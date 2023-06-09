@@ -147,11 +147,13 @@ class GenerateController extends Controller
             foreach ($mapel as $ckey => $value) {
                 $not_avaliabe_time_start = '';
                 $not_avaliabe_time_end = '';
-
-                // if ($end_kbm < $time_now) {
-                //     $time_now = Carbon::parse('07:00:00');
-                //     break;
-                // }
+                
+                if ($end_kbm < $time_now && $day == 'Sabtu') {
+                    $time_now = Carbon::parse('07:00:00');
+                    $waktu_mulai = Carbon::parse('07:00:00');
+                    $waktu_selesai = Carbon::parse('07:00:00');
+                    break;
+                }
 
                 foreach ($time_not_found as $tkey => $time) {
                     if ($time->hari == $day) {
@@ -197,6 +199,7 @@ class GenerateController extends Controller
             }
         }
 
+        dd($data);
         return $data;
     }
 
