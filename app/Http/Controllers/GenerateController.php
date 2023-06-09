@@ -148,7 +148,7 @@ class GenerateController extends Controller
                 $not_avaliabe_time_start = '';
                 $not_avaliabe_time_end = '';
                 
-                if ($end_kbm < $time_now && $day == 'Sabtu') {
+                if ($end_kbm <= $time_now) {
                     $time_now = Carbon::parse('07:00:00');
                     $waktu_mulai = Carbon::parse('07:00:00');
                     $waktu_selesai = Carbon::parse('07:00:00');
