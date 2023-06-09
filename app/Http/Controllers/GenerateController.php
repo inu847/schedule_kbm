@@ -199,7 +199,7 @@ class GenerateController extends Controller
             }
         }
 
-        dd($data);
+        // dd($data);
         return $data;
     }
 
