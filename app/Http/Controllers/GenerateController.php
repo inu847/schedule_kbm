@@ -16,6 +16,13 @@ use Illuminate\Http\Request;
 
 class GenerateController extends Controller
 {
+    private $end_kbm;
+
+    public function __construct()
+    {
+        $this->end_kbm = Carbon::parse('12:00:00');
+    }
+
     function index() {
         $generate = Generate::orderBy('id', 'asc')
             ->select('id', 'kode_mapel', 'mapel','kelas','ruang','nama_guru','hari', 'waktu')
@@ -126,7 +133,7 @@ class GenerateController extends Controller
 
     public function generateWaktu($mapel)
     {
-        $end_kbm = Carbon::parse('12:00:00');
+        $end_kbm = $this->end_kbm;
         $time_now = Carbon::parse('07:00:00');
         $waktu_mulai = Carbon::parse('07:00:00');
         $waktu_selesai = Carbon::parse('07:00:00');
@@ -144,6 +151,7 @@ class GenerateController extends Controller
         $data = [];
         $no = 0;
         foreach ($dayOfWeek as $key => $day) {
+            $sorting = 1;
             foreach ($mapel as $ckey => $value) {
                 $not_avaliabe_time_start = '';
                 $not_avaliabe_time_end = '';
@@ -186,6 +194,8 @@ class GenerateController extends Controller
                 $data[$no] = [
                     'hari' => $day,
                     'waktu' => $waktu_kbm,
+                    'number_day' => $key+1,
+                    'number_sorting' => $sorting,
                     'kode_mapel' => $value->kode_umum ?? $value->kode_agama,
                     'mapel' => $value->mapel,
                     'durasi' => $value->durasi,
@@ -196,20 +206,55 @@ class GenerateController extends Controller
 
                 $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
                 $no++;
+                $sorting++;
             }
         }
 
         foreach ($data as $key => $value) {
             $time_end = explode('-', $value['waktu'])[1];
-            $time_now = Carbon::parse($time_end);
-            
-            if ($end_kbm <= $time_now) {
-                $time_now = Carbon::parse('07:00:00');
-                $waktu_mulai = Carbon::parse('07:00:00');
-                $waktu_selesai = Carbon::parse('07:00:00');
-                break;
+            $time_end_kbm = Carbon::parse($time_end);
+            $max_number = collect($data)->where('number_day', $value['number_day'])->max('number_sorting');
+
+            if ($this->end_kbm < $time_end_kbm) {
+                $mapel_pengganti = MapelAgama::where('durasi', 30)
+                                    ->union(MapelUmum::where('durasi', 30))
+                                    ->inRandomOrder()
+                                    ->first();
+                $data[$key]['kode_mapel'] = $mapel_pengganti->kode_agama ?? null;
+                $data[$key]['mapel'] = $mapel_pengganti->mapel ?? null;
+                $data[$key]['durasi'] = $mapel_pengganti->durasi ?? null;
+                $first_time = explode('-', $data[$key]['waktu'])[0];
+                $last_time = explode('-', $data[$key]['waktu'])[1];
+                $last_time = Carbon::parse($last_time)->subMinutes($mapel_pengganti->durasi)->format('H:i');
+                $data[$key]['waktu'] = $first_time . '-' . $last_time;
+            }
+            if ($value['number_sorting'] == $max_number) {
+                if ($this->end_kbm > $time_end_kbm) {
+                    $mapel_pengganti = MapelAgama::where('durasi', 30)
+                                        ->union(MapelUmum::where('durasi', 30))
+                                        ->inRandomOrder()
+                                        ->first();
+                    $newElement['kode_mapel'] = $mapel_pengganti->kode_agama ?? null;
+                    $newElement['mapel'] = $mapel_pengganti->mapel ?? null;
+                    $newElement['durasi'] = $mapel_pengganti->durasi ?? null;
+                    $newElement['hari'] = $value['hari'] ?? null;
+                    $first_time = explode('-', $value['waktu'])[0];
+                    $last_time = explode('-', $value['waktu'])[1];
+                    $last_time = Carbon::parse($last_time)->addMinutes($mapel_pengganti->durasi)->format('H:i');
+                    $newElement['waktu'] = $first_time . '-' . $last_time;
+                    $newElement['number_day'] = $value['number_day'];
+                    $newElement['number_sorting'] = $key;
+                    $newElement['kelas'] = null;
+                    $newElement['ruang'] = null;
+                    $newElement['nama_guru'] = null;
+                    array_push($data, $newElement);
+                }
             }
         }
+        
+        $data = collect($data)->sortBy('number_day')->toArray();
+        // $data = collect($data)->sortBy('number_sorting')->toArray();
+
         return $data;
     }
 
@@ -218,8 +263,7 @@ class GenerateController extends Controller
         $data_kelas = DataKelas::orderBy('id', 'asc')->get();
         $data_ruangan = DataRuangan::orderBy('id', 'asc')->get();
         $data_guru = DataGuru::orderBy('id', 'asc')->get();
-        // KELAS 10
-        // RUANGAN B1
+
         $result_generate_kelas = [];
         $no = 0;
         foreach ($data_kelas as $key => $kelas) {
