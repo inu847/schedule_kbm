@@ -46,7 +46,7 @@
         </div>
         <div class="row">
           <div class="col-8">
-            <button type="submit" class="btn btn-primary btn-block col-6">Register</button>
+            <a href="{{ route('register') }}" class="btn btn-primary btn-block col-6">Register</a>
           </div>
           <!-- /.col -->
           <div class="col-4">

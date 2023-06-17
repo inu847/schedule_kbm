@@ -26,6 +26,15 @@
     </div>
     <div class="card-body">
       <p class="login-box-msg">Sign in to start your session</p>
+      @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+      @endif
 
       <form action="{{ route('login') }}" method="post">
         @csrf
@@ -47,11 +56,11 @@
         </div>
         <div class="row">
           <div class="col-8">
-            <button type="submit" class="btn btn-primary btn-block col-6">Register</button>
+            <a href="{{ route('register') }}" class="btn btn-primary btn-block col-6">Daftar</a>
           </div>
           <!-- /.col -->
           <div class="col-4">
-            <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
           </div>
           <!-- /.col -->
         </div>

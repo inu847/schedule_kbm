@@ -45,7 +45,7 @@
           </li>
         <li class="nav-item">
           <a href="#" class="nav-link">
-            <i class="nav-icon fas fa-copy"></i>
+            <i class="nav-icon fas fa-book"></i>
             <p>
               Data Mapel
               <i class="fas fa-angle-left right"></i>
@@ -78,7 +78,7 @@
         </li>
         <li class="nav-item">
           <a href="{{ route('data-ruangan.index') }}" class="nav-link">
-            <i class="nav-icon fas fa-ellipsis-h"></i>
+            <i class="nav-icon fas fa-building"></i>
             <p>Data Ruangan</p>
           </a>
         </li>
@@ -90,8 +90,14 @@
         </li>
         <li class="nav-item">
           <a href="{{ route('generate-jadwal.index') }}" class="nav-link">
-            <i class="fas fa-circle nav-icon"></i>
+            <i class="nav-icon fas fa-calendar nav-icon"></i>
             <p>Generate Jadwal</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ route('general-setting.index') }}" class="nav-link">
+            <i class="nav-icon fas fa-gear nav-icon"></i>
+            <p>General Setting</p>
           </a>
         </li>
         <li class="nav-item">

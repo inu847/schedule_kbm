@@ -112,13 +112,27 @@ class GenerateController extends Controller
                                     ->get();
 
         $mapel = [];
-        
-        foreach($mapel_agama as $value) {
-            array_push($mapel, $value);
+        $limit_mapel_agama = (int)generalSetting('mapel_agama')->value;
+        $limit_mapel_umum = (int)generalSetting('mapel_umum')->value;
+
+        foreach($mapel_agama as $key => $value) {
+            $dataGuru = DataGuru::where('code_mapel', $value->kode_agama)
+                                    ->select('nama_guru')
+                                    ->first();
+            $value->nama_guru = $dataGuru->nama_guru ?? null;
+            if ($value->kode_agama && $limit_mapel_agama >= $key+1) {
+                array_push($mapel, $value);
+            }
         }
 
-        foreach($mapel_umum as $value) {
-            array_push($mapel, $value);
+        foreach($mapel_umum as $key => $value) {
+            $dataGuru = DataGuru::where('code_mapel', $value->kode_umum)
+                                    ->select('nama_guru')
+                                    ->first();
+            $value->nama_guru = $dataGuru->nama_guru ?? null;
+            if ($dataGuru->nama_guru && $limit_mapel_umum >= $key+1) {
+                array_push($mapel, $value);
+            }
         }
 
         $generate_waktu = $this->generateWaktu($mapel);
@@ -152,7 +166,7 @@ class GenerateController extends Controller
         $no = 0;
         foreach ($dayOfWeek as $key => $day) {
             $sorting = 1;
-            foreach ($mapel as $ckey => $value) {
+            foreach ($mapel as $value) {
                 $not_avaliabe_time_start = '';
                 $not_avaliabe_time_end = '';
                 
@@ -163,6 +177,9 @@ class GenerateController extends Controller
                     break;
                 }
 
+                // fungsi explode
+                // '08:30', '09:00'
+                // ['08:30', '09:00']
                 foreach ($time_not_found as $tkey => $time) {
                     $start_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[0]);
                     $end_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[1]);
@@ -193,7 +210,7 @@ class GenerateController extends Controller
                     $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
                     $waktu_selesai = $waktu_selesai->addMinutes($value->durasi);
                 }
-
+                
                 $waktu_mulai = $waktu_mulai->subMinutes($value->durasi);
                 $waktu_kbm = $waktu_mulai->format('H:i') . '-' . $waktu_selesai->format('H:i');
                 
@@ -207,7 +224,7 @@ class GenerateController extends Controller
                     'durasi' => $value->durasi,
                     'kelas' => null,
                     'ruang' => null,
-                    'nama_guru' => null,
+                    'nama_guru' => $value->nama_guru,
                 ];
 
                 $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
@@ -215,22 +232,25 @@ class GenerateController extends Controller
                 $sorting++;
             }
         }
-
+        
+        // RULE 2
         foreach ($data as $key => $value) {
             $time_start = explode('-', $value['waktu'])[0];
             $time_start_kbm = Carbon::parse($time_start);
             $time_end = explode('-', $value['waktu'])[1];
             $time_end_kbm = Carbon::parse($time_end);
-            $max_number = collect($data)->where('number_day', $value['number_day'])->max('number_sorting');
 
             if ($this->end_kbm < $time_end_kbm) {
-                $mapel_pengganti = MapelAgama::where('durasi', 30)
-                                    ->union(MapelUmum::where('durasi', 30))
+                $guru = DataGuru::pluck('code_mapel');
+                $mapel_pengganti = MapelAgama::where('durasi', 30)->whereIn('kode_agama', $guru)
+                                    ->union(MapelUmum::where('durasi', 30)->whereIn('kode_umum', $guru))
                                     ->inRandomOrder()
                                     ->first();
-                $data[$key]['kode_mapel'] = $mapel_pengganti->kode_agama ?? null;
+                $dataGuru = DataGuru::where('code_mapel', $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum)->first();
+                $data[$key]['kode_mapel'] = $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum;
                 $data[$key]['mapel'] = $mapel_pengganti->mapel ?? null;
                 $data[$key]['durasi'] = $mapel_pengganti->durasi ?? null;
+                $data[$key]['nama_guru'] = $dataGuru->nama_guru ?? null;
                 $first_time = explode('-', $data[$key]['waktu'])[0];
                 $last_time = explode('-', $data[$key]['waktu'])[1];
                 $last_time = Carbon::parse($last_time)->subMinutes($mapel_pengganti->durasi)->format('H:i');
@@ -243,7 +263,6 @@ class GenerateController extends Controller
         }
 
         $data = collect($data)->sortBy('number_day')->toArray();
-        // $data = collect($data)->sortBy('number_sorting')->toArray();
 
         return $data;
     }
@@ -256,8 +275,8 @@ class GenerateController extends Controller
 
         $result_generate_kelas = [];
         $no = 0;
-        foreach ($data_kelas as $key => $kelas) {
-            foreach ($data_ruangan as $ckey => $ruang) {
+        foreach ($data_kelas as $kelas) {
+            foreach ($data_ruangan as $ruang) {
                 $result_kelas = [
                     'kelas' => $kelas->kelas,
                     'ruang' => $ruang->ruang,
@@ -266,29 +285,9 @@ class GenerateController extends Controller
             }
         }
 
-        // dd($result_generate_kelas);
-        $result_generate_guru = [];
-        $count_guru = count($data_guru) - 1;
-        $index_guru = 0;
-        foreach ($result_generate_kelas as $key => $generate_kelas) {
-            $result_guru = [
-                'kelas' => $generate_kelas['kelas'],
-                'ruang' => $generate_kelas['ruang'],
-                'nama_guru' => $data_guru[$index_guru]->nama_guru,
-            ];
-            array_push($result_generate_guru, $result_guru);
-
-            if ($index_guru < $count_guru) {
-                $index_guru++;
-            }else {
-                $index_guru = 0;
-            }
-        }
-
-        // dd($result_generate_guru);
         $dataGenerate = [];
-        $count_result_generate_guru = count($result_generate_guru) - 1;
-        $index_result_generate_guru = 0;
+        $count_result_generate_kelas = count($result_generate_kelas) - 1;
+        $index_result_generate_kelas = 0;
 
         foreach ($data as $hkey => $detail) {
             $result = [
@@ -297,21 +296,31 @@ class GenerateController extends Controller
                 'kode_mapel' => $detail['kode_mapel'] ?? 'err',
                 'mapel' => $detail['mapel'] ?? 'err',
                 'durasi' => $detail['durasi'] ?? 'err',
-                'kelas' => $result_generate_guru[$index_result_generate_guru]['kelas'] ?? 'err',
-                'ruang' => $result_generate_guru[$index_result_generate_guru]['ruang'] ?? 'err',
-                'nama_guru' => $result_generate_guru[$index_result_generate_guru]['nama_guru'] ?? 'err',
+                'nama_guru' => $detail['nama_guru'] ?? 'err',
+                'kelas' => $result_generate_kelas[$index_result_generate_kelas]['kelas'] ?? 'err',
+                'ruang' => $result_generate_kelas[$index_result_generate_kelas]['ruang'] ?? 'err',
             ];
             
             array_push($dataGenerate, $result);
 
-            if ($index_result_generate_guru < $count_result_generate_guru) {
-                $index_result_generate_guru++;
+            if ($index_result_generate_kelas < $count_result_generate_kelas) {
+                $index_result_generate_kelas++;
             }else {
-                $index_result_generate_guru = 0;
+                $index_result_generate_kelas = 0;
             }
         }
 
         // dd($dataGenerate);
         return $dataGenerate;
+    }
+
+    public function deleteAll()
+    {
+        $data = Generate::all();
+        foreach ($data as $value) {
+            $value->delete();
+        }
+
+        return redirect()->back()->with('success', 'Data berhasil dihapus');
     }
 }

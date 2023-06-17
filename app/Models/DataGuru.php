@@ -10,4 +10,12 @@ class DataGuru extends Model
     use HasFactory;
 
     protected $table = 'dataguru';
+
+    protected $fillable = [
+        'code_mapel',
+        'nama_guru',
+        'jabatan',
+        'mapel',
+        'no_hp',
+    ];
 }

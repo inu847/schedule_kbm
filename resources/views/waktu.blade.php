@@ -117,9 +117,9 @@
         </tr>
       </thead>
       <tbody>
-        @foreach($semua_waktu as $waktu)
+        @foreach($semua_waktu as $key => $waktu)
           <tr>
-            <td>{{ $waktu->id }}</td>
+            <td>{{ $key + 1 }}</td>
             <td>{{ $waktu->hari }}</td>
             <td>{{ $waktu->waktu }}</td>
             <td>

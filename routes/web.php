@@ -6,6 +6,7 @@ use App\Http\Controllers\KelasController;
 use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\AgamaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GeneralSettingController;
 use App\Http\Controllers\UmumController;
 use App\Http\Controllers\WaktuController;
 use App\Http\Controllers\GenerateController;
@@ -64,6 +65,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/generate-jadwal', [GenerateController::class, 'index'])->name('generate-jadwal.index');
     Route::delete('/generate/delete/{id}', [GenerateController::class, 'delete']);
     Route::post('/generate/store', [GenerateController::class, 'store'])->name('generate.store');
+    Route::post('/generate/delete-all', [GenerateController::class, 'deleteAll'])->name('generate.deleteAll');
+
+    // ROUTE RESOURCE
+    Route::resource('general-setting', GeneralSettingController::class);
 });
 
 Auth::routes();

@@ -83,7 +83,7 @@
           </div>
           <div class="modal-footer justify-content-between">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Submits</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
           </div>
         </form>
       </div>
@@ -95,14 +95,19 @@
     <input type='hidden' class='form-control' name='generate' value="true">
   </form>
 
+  <form action='{{ route('generate.deleteAll') }}' method='POST' id="delete-all" enctype='multipart/form-data'>
+    @csrf
+  </form>
+
 <div class= "card p-1 mt-1">
 
   <div class="card-header">
     <h3 class="float-left">Jadwal Pelajaran</h3>
 
     <div class="float-right">
+      <button class="btn btn-danger float-end" onclick="$('#delete-all').submit()"><i class="fas fa-trash"></i> Hapus Semua Jadwal</button>
       <button class="btn btn-secondary float-end" onclick="$('#generate').submit()"><i class="fa-brands fa-searchengin"></i> Generate Jadwal</button>
-      <button class="btn btn-dark float-end mx-2" data-toggle="modal" data-target="#modal-default"><i class="fa-solid fa-plus"></i> Tambah Data</button>
+      {{-- <button class="btn btn-dark float-end" data-toggle="modal" data-target="#modal-default"><i class="fa-solid fa-plus"></i> Tambah Data</button> --}}
     </div>
   </div>
 

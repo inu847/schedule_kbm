@@ -28,16 +28,12 @@
             </div>
             <div class="form-group">
               <label>Mapel </label>
-              <!-- pengambilan data dari mapel  -->
-              <select class="form-control select2" name="mapel" aria-label="Default select example">
+              <select name="code_mapel" id="" class="form-control">
                 <option value="" selected disabled>Pilih Opsi</option>
-                @foreach($mapel_umum as $mapel)
-                  <option value="{{ $mapel->mapel }}"> Mapel Umum | {{ $mapel->mapel }} </option>
+                @foreach ($mapel as $item)
+                    <option value="{{ $item->code_mapel }}">{{ $item->code_mapel." - ".$item->mapel }}</option>
                 @endforeach
-                @foreach($mapel_agama as $mapel)
-                  <option value="{{ $mapel->mapel }}">Mapel Agama | {{ $mapel->mapel }} </option>
-                @endforeach
-            </select>
+              </select>
             </div>
             <div class="form-group">
               <label>Nomor HP </label>
@@ -79,7 +75,12 @@
             </div>
             <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label">Mapel</label>
-              <input type="text" class="form-control" value="{{ $guru->mapel }}" name="mapel">
+              <select name="code_mapel" id="" class="form-control">
+                <option value="" selected disabled>Pilih Opsi</option>
+                @foreach ($mapel as $item)
+                    <option value="{{ $item->code_mapel }}" {{ ($item->code_mapel == $guru->code_mapel) ? 'selected' : '' }}>{{ $item->code_mapel." - ".$item->mapel }}</option>
+                @endforeach
+              </select>
             </div>
             <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label">Nomor HP</label>
@@ -116,9 +117,9 @@
         </tr>
       </thead>
       <tbody>
-        @foreach($semua_guru as $guru)
+        @foreach($semua_guru as $key => $guru)
             <tr>
-                <td>{{ $guru->id }}</td>
+                <td>{{ $key + 1 }}</td>
                 <td>{{ $guru->nama_guru }}</td>
                 <td>{{ $guru->jabatan }}</td>
                 <td>{{ $guru->mapel }}</td>
