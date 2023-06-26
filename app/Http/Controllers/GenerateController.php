@@ -269,19 +269,23 @@ class GenerateController extends Controller
 
     public function generateKelas($data)
     {
-        $data_kelas = DataKelas::orderBy('id', 'asc')->get();
-        $data_ruangan = DataRuangan::orderBy('id', 'asc')->get();
+        $data_kelas = DataKelas::orderBy('kelas', 'asc')->get();
+        $data_ruangan = DataRuangan::orderBy('ruang', 'asc')->get();
         $data_guru = DataGuru::orderBy('id', 'asc')->get();
 
         $result_generate_kelas = [];
+        $index_data_ruangan = 0;
         $no = 0;
         foreach ($data_kelas as $kelas) {
-            foreach ($data_ruangan as $ruang) {
-                $result_kelas = [
-                    'kelas' => $kelas->kelas,
-                    'ruang' => $ruang->ruang,
-                ];
-                array_push($result_generate_kelas, $result_kelas);
+            $result_kelas = [
+                'kelas' => $kelas->kelas,
+                'ruang' => $data_ruangan[$index_data_ruangan]->ruang,
+            ];
+            array_push($result_generate_kelas, $result_kelas);
+            if ($index_data_ruangan < $data_ruangan->count()) {
+                $index_data_ruangan ++;
+            }else{
+                $index_data_ruangan = 0;
             }
         }
 
@@ -289,26 +293,29 @@ class GenerateController extends Controller
         $count_result_generate_kelas = count($result_generate_kelas) - 1;
         $index_result_generate_kelas = 0;
 
-        foreach ($data as $hkey => $detail) {
-            $result = [
-                'hari' => $detail['hari'] ?? 'err',
-                'waktu' => $detail['waktu'] ?? 'err',
-                'kode_mapel' => $detail['kode_mapel'] ?? 'err',
-                'mapel' => $detail['mapel'] ?? 'err',
-                'durasi' => $detail['durasi'] ?? 'err',
-                'nama_guru' => $detail['nama_guru'] ?? 'err',
-                'kelas' => $result_generate_kelas[$index_result_generate_kelas]['kelas'] ?? 'err',
-                'ruang' => $result_generate_kelas[$index_result_generate_kelas]['ruang'] ?? 'err',
-            ];
-            
-            array_push($dataGenerate, $result);
-
-            if ($index_result_generate_kelas < $count_result_generate_kelas) {
-                $index_result_generate_kelas++;
-            }else {
-                $index_result_generate_kelas = 0;
+        foreach ($result_generate_kelas as $key => $value) {
+            foreach ($data as $hkey => $detail) {
+                $result = [
+                    'hari' => $detail['hari'] ?? 'err',
+                    'waktu' => $detail['waktu'] ?? 'err',
+                    'kode_mapel' => $detail['kode_mapel'] ?? 'err',
+                    'mapel' => $detail['mapel'] ?? 'err',
+                    'durasi' => $detail['durasi'] ?? 'err',
+                    'nama_guru' => $detail['nama_guru'] ?? 'err',
+                    'kelas' => $value['kelas'] ?? 'err',
+                    'ruang' => $value['ruang'] ?? 'err',
+                ];
+                
+                array_push($dataGenerate, $result);
+    
+                if ($index_result_generate_kelas < $count_result_generate_kelas) {
+                    $index_result_generate_kelas++;
+                }else {
+                    $index_result_generate_kelas = 0;
+                }
             }
         }
+
 
         // dd($dataGenerate);
         return $dataGenerate;
