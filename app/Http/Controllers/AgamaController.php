@@ -9,7 +9,7 @@ class AgamaController extends Controller
 {
     function index() {
         $agama = DB::table('mapelagama')
-            ->select('id','kode_agama', 'mapel', 'kelas','durasi')
+            ->select('id','kode_agama', 'mapel', 'durasi')
             ->get();
         $data_kelas = DB::table('datakelas')
             ->select('kelas')
@@ -29,7 +29,7 @@ class AgamaController extends Controller
         DB::table('mapelagama')->insert([
             'kode_agama' => $request->kode_agama,
             'mapel' => $request->mapel,
-            'kelas' => $request->kelas,
+            // 'kelas' => $request->kelas,
             'durasi' => (int)$request->durasi,
         ]);
         return redirect('/mapel-agama');
@@ -40,7 +40,7 @@ class AgamaController extends Controller
               ->update([
                 'kode_agama' => $request->agama,
                 'mapel' => $request->mapel,
-                'kelas' => $request->kelas,
+                // 'kelas' => $request->kelas,
                 'durasi' => $request->durasi,
               ]);
         return redirect('/mapel-agama');

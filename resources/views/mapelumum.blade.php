@@ -28,14 +28,14 @@
             <label>Mapel</label>
             <input type="text" class="form-control" name="mapel">
           </div>
-          <div class="form-group">
+          {{-- <div class="form-group">
             <label>Kelas</label>
             <select class="form-control select2" name="kelas" aria-label="Default select example">
               @foreach($data_kelas as $kelas)
                 <option value="{{ $kelas->kelas }}">  {{ $kelas->kelas }} </option>
               @endforeach
             </select>
-          </div>
+          </div> --}}
           <div class="form-group">
             <label>Durasi</label>
             <select name="durasi" id="" class="form-control select2">
@@ -79,14 +79,14 @@
             <label>Mapel</label>
             <input type="text" class="form-control" value="{{ $umum->mapel }}" name="mapel">
           </div>
-          <div class="form-group">
+          {{-- <div class="form-group">
             <label>Kelas</label>
             <select class="form-control select2" name="kelas" aria-label="Default select example">
               @foreach($data_kelas as $kelas)
                 <option value="{{ $kelas->kelas }}" {{ ($kelas->kelas == $umum->kelas) ? 'selected' : '' }}>{{ $kelas->kelas }} </option>
               @endforeach
             </select>
-          </div>
+          </div> --}}
           <div class="form-group">
             <label>Durasi</label>
             <select name="durasi" id="" class="form-control select2">
@@ -122,7 +122,7 @@
           <th scope="col">No</th>
           <th scope="col">Kode Mapel</th>
           <th scope="col">Mapel</th>
-          <th scope="col">Kelas</th>
+          {{-- <th scope="col">Kelas</th> --}}
           <th scope="col">Durasi (Menit)</th>
           <th scope="col">Aksi</th>
         </tr>
@@ -133,7 +133,7 @@
                 <td>{{ $umum->id }}</td>
                 <td>{{ $umum->kode_umum }}</td>
                 <td>{{ $umum->mapel }}</td>
-                <td>{{ $umum->kelas }}</td>
+                {{-- <td>{{ $umum->kelas }}</td> --}}
                 <td>{{ $umum->durasi }}</td>
                 <td>
                   <button type="button" class="btn btn-warning"  data-toggle="modal" data-target="#editumum{{ $umum->id }}"><i class="fas fa-pencil-alt"></i></button>

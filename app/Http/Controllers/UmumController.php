@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Models\DataKelas;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
@@ -9,11 +11,9 @@ class UmumController extends Controller
 {
     function index() {
         $umum = DB::table('mapelumum')
-            ->select('id','kode_umum', 'mapel', 'kelas','durasi')
+            ->select('id','kode_umum', 'mapel', 'durasi')
             ->get();
-        $data_kelas = DB::table('datakelas')
-            ->select('kelas')
-            ->get();
+        $data_kelas = DataKelas::all();
         return view('mapelumum', [
             'semua_umum' => $umum,
             'data_kelas' => $data_kelas,
@@ -28,7 +28,7 @@ class UmumController extends Controller
         DB::table('mapelumum')->insert([
             'kode_umum' => $request->kode_umum,
             'mapel' => $request->mapel,
-            'kelas' => $request->kelas,
+            // 'kelas' => $request->kelas,
             'durasi' => $request->durasi,
         ]);
         return redirect('/mapel-umum');
@@ -39,7 +39,7 @@ class UmumController extends Controller
               ->update([
                 'kode_umum' => $request->umum,
                 'mapel' => $request->mapel,
-                'kelas' => $request->kelas,
+                // 'kelas' => $request->kelas,
                 'durasi' => $request->durasi,
               ]);
         return redirect('/mapel-umum');
