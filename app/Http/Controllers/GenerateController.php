@@ -109,6 +109,7 @@ class GenerateController extends Controller
                                     ->get();
 
         $mapel_umum = MapelUmum::orderBy('kode_umum', 'asc')
+                                ->whereNotIn('kode_umum', ['PJOK', 'PRAMUKA'])
                                     ->get();
 
         $mapel = [];
@@ -214,6 +215,23 @@ class GenerateController extends Controller
                 $waktu_mulai = $waktu_mulai->subMinutes($value->durasi);
                 $waktu_kbm = $waktu_mulai->format('H:i') . '-' . $waktu_selesai->format('H:i');
                 
+                // PJOK, PRAMUKA DI HARI SABTU
+                if ($day == 'Sabtu') {
+                    if ($waktu_mulai >= Carbon::parse('10:00') && $waktu_mulai < Carbon::parse('11:00') ) {
+                        $value->kode_umum = 'PJOK';
+                        $value->kode_agama = 'PJOK';
+                        $value->mapel = 'PJOK';
+                        $value->durasi = 60;
+                        $value->nama_guru = DataGuru::where('code_mapel', 'PJOK')->first()->nama_guru ?? null;
+                    }elseif ($waktu_mulai >= Carbon::parse('11:00')) {
+                        $value->kode_umum = 'PRAMUKA';
+                        $value->kode_agama = 'PRAMUKA';
+                        $value->mapel = 'PRAMUKA';
+                        $value->durasi = 60;
+                        $value->nama_guru = DataGuru::where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
+                    }
+                }
+
                 $data[$no] = [
                     'hari' => $day,
                     'waktu' => $waktu_kbm,

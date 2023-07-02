@@ -43,7 +43,7 @@
               </span>
             @enderror
         </div>
-        <div class="input-group mb-3">
+        {{-- <div class="input-group mb-3">
             <input type="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" placeholder="Email">
             <div class="input-group-append">
               <div class="input-group-text">
@@ -56,7 +56,7 @@
                   <strong>{{ $message }}</strong>
               </span>
             @enderror
-        </div>
+        </div> --}}
         <div class="input-group mb-3">
           <input type="text" name="username" value="{{ old('username') }}" class="form-control @error('username') is-invalid @enderror" placeholder="Username">
           <div class="input-group-append">

@@ -25,7 +25,7 @@
       </div>
     </div>
     <div class="card-body">
-      <p class="login-box-msg">Sign in to start your session</p>
+      <p class="login-box-msg">Masuk untuk memulai sesi Anda</p>
       @if ($errors->any())
         <div class="alert alert-danger">
             <ul>

@@ -37,6 +37,7 @@ class GuruController extends Controller
             'jabatan' => $request->jabatan,
             'mapel' => $mapel->mapel,
             'no_hp' => $request->no_hp,
+            'code_mapel' => $request->code_mapel,
         ]);
         return redirect('/data-guru');
     }
