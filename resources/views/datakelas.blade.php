@@ -87,9 +87,9 @@
         </tr>
       </thead>
       <tbody>
-        @foreach($semua_kelas as $kelas)
+        @foreach($semua_kelas as $key => $kelas)
           <tr>
-              <td>{{ $kelas->id }}</td>
+              <td>{{ $key+1 }}</td>
               <td>{{ $kelas->kelas }}</td>
               <td>{{ $kelas->jumlah_siswa }}</td>
               <td>

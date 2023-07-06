@@ -131,8 +131,15 @@ class GenerateController extends Controller
                                     ->select('nama_guru')
                                     ->first();
             $value->nama_guru = $dataGuru->nama_guru ?? null;
-            if ($dataGuru->nama_guru && $limit_mapel_umum >= $key+1) {
-                array_push($mapel, $value);
+            if (isset($dataGuru->nama_guru)) {
+                if ($dataGuru->nama_guru && $limit_mapel_umum >= $key+1) {
+                    array_push($mapel, $value);
+                }
+            }else{
+                $value->nama_guru = null;
+                if ($limit_mapel_umum >= $key+1) {
+                    array_push($mapel, $value);
+                }
             }
         }
 
@@ -165,6 +172,9 @@ class GenerateController extends Controller
 
         $data = [];
         $no = 0;
+        $index_mapel_check = 0;
+        $max_mapel = count($mapel) - 1;
+
         foreach ($dayOfWeek as $key => $day) {
             $sorting = 1;
             foreach ($mapel as $value) {
@@ -215,20 +225,36 @@ class GenerateController extends Controller
                 $waktu_mulai = $waktu_mulai->subMinutes($value->durasi);
                 $waktu_kbm = $waktu_mulai->format('H:i') . '-' . $waktu_selesai->format('H:i');
                 
+                $kode_mapel = null;
+                $nama_mapel = null;
+                for ($i=0; $i < $max_mapel; $i++) { 
+                    if ($mapel[$i]->durasi == $value->durasi) {                        
+                        if ($index_mapel_check < $max_mapel) {
+                            $index_mapel_check++;
+                        }else {
+                            $index_mapel_check = 0;
+                        }
+                        
+                        break;
+                    }
+                }
+
+                $kode_mapel = $mapel[$index_mapel_check]->kode_umum ?? $mapel[$index_mapel_check]->kode_agama;
+                $nama_mapel = $mapel[$index_mapel_check]->mapel;
+                $nama_guru = DataGuru::where('code_mapel', $kode_mapel)->first()->nama_guru ?? null;
+
                 // PJOK, PRAMUKA DI HARI SABTU
                 if ($day == 'Sabtu') {
                     if ($waktu_mulai >= Carbon::parse('10:00') && $waktu_mulai < Carbon::parse('11:00') ) {
-                        $value->kode_umum = 'PJOK';
-                        $value->kode_agama = 'PJOK';
-                        $value->mapel = 'PJOK';
+                        $kode_mapel = 'PJOK';
+                        $nama_mapel = 'PJOK';
                         $value->durasi = 60;
-                        $value->nama_guru = DataGuru::where('code_mapel', 'PJOK')->first()->nama_guru ?? null;
+                        $nama_guru = DataGuru::where('code_mapel', 'PJOK')->first()->nama_guru ?? null;
                     }elseif ($waktu_mulai >= Carbon::parse('11:00')) {
-                        $value->kode_umum = 'PRAMUKA';
-                        $value->kode_agama = 'PRAMUKA';
-                        $value->mapel = 'PRAMUKA';
+                        $nama_mapel = 'PRAMUKA';
+                        $nama_mapel = 'PRAMUKA';
                         $value->durasi = 60;
-                        $value->nama_guru = DataGuru::where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
+                        $nama_guru = DataGuru::where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
                     }
                 }
 
@@ -237,12 +263,12 @@ class GenerateController extends Controller
                     'waktu' => $waktu_kbm,
                     'number_day' => $key+1,
                     'number_sorting' => $sorting,
-                    'kode_mapel' => $value->kode_umum ?? $value->kode_agama,
-                    'mapel' => $value->mapel,
+                    'kode_mapel' => $kode_mapel,
+                    'mapel' => $nama_mapel,
                     'durasi' => $value->durasi,
                     'kelas' => null,
                     'ruang' => null,
-                    'nama_guru' => $value->nama_guru,
+                    'nama_guru' => $nama_guru,
                 ];
 
                 $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
@@ -250,6 +276,8 @@ class GenerateController extends Controller
                 $sorting++;
             }
         }
+
+        // dd($data);
         
         // RULE 2
         foreach ($data as $key => $value) {
@@ -314,14 +342,14 @@ class GenerateController extends Controller
         foreach ($result_generate_kelas as $key => $value) {
             foreach ($data as $hkey => $detail) {
                 $result = [
-                    'hari' => $detail['hari'] ?? 'err',
-                    'waktu' => $detail['waktu'] ?? 'err',
-                    'kode_mapel' => $detail['kode_mapel'] ?? 'err',
-                    'mapel' => $detail['mapel'] ?? 'err',
-                    'durasi' => $detail['durasi'] ?? 'err',
-                    'nama_guru' => $detail['nama_guru'] ?? 'err',
-                    'kelas' => $value['kelas'] ?? 'err',
-                    'ruang' => $value['ruang'] ?? 'err',
+                    'hari' => $detail['hari'] ?? '-',
+                    'waktu' => $detail['waktu'] ?? '-',
+                    'kode_mapel' => $detail['kode_mapel'] ?? '-',
+                    'mapel' => $detail['mapel'] ?? '-',
+                    'durasi' => $detail['durasi'] ?? '-',
+                    'nama_guru' => $detail['nama_guru'] ?? '-',
+                    'kelas' => $value['kelas'] ?? '-',
+                    'ruang' => $value['ruang'] ?? '-',
                 ];
                 
                 array_push($dataGenerate, $result);
