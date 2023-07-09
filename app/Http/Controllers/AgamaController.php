@@ -25,7 +25,17 @@ class AgamaController extends Controller
         return redirect('/mapel-agama');
     }
     function store(Request $request){
-        // dd($request->all());
+        // VALIDATE
+        $message = $request->validate([
+            'kode_agama' => 'required, unique:mapelagama',
+            'mapel' => 'required',
+            'durasi' => 'required',
+        ]);
+        // IF NOT VALIDATE RETURN WITH FLASH MESSAGE
+        if($message){
+            return redirect('/mapel-agama')->with('danger', $message);
+        }
+
         DB::table('mapelagama')->insert([
             'kode_agama' => $request->kode_agama,
             'mapel' => $request->mapel,
@@ -35,6 +45,17 @@ class AgamaController extends Controller
         return redirect('/mapel-agama');
     }
     function update(Request $request){
+        // VALIDATE
+        $message = $request->validate([
+            'agama' => 'required, unique:mapelagama',
+            'mapel' => 'required',
+            'durasi' => 'required',
+        ]);
+        // IF NOT VALIDATE RETURN WITH FLASH MESSAGE
+        if($message){
+            return redirect('/mapel-agama')->with('danger', $message);
+        }
+        
         DB::table('mapelagama')
               ->where('id', '=', $request->id)
               ->update([

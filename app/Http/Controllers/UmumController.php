@@ -25,6 +25,17 @@ class UmumController extends Controller
         return redirect('/mapel-umum');
     }
     function store(Request $request){
+        // VALIDATE
+        $message = $request->validate([
+            'kode_umum' => 'required, unique:mapelumum',
+            'mapel' => 'required',
+            'durasi' => 'required',
+        ]);
+        // IF NOT VALIDATE RETURN WITH FLASH MESSAGE
+        if($message){
+            return redirect('/mapel-umum')->with('danger', $message);
+        }
+
         DB::table('mapelumum')->insert([
             'kode_umum' => $request->kode_umum,
             'mapel' => $request->mapel,
@@ -34,6 +45,17 @@ class UmumController extends Controller
         return redirect('/mapel-umum');
     }
     function update(Request $request){
+        // VALIDATE
+        $message = $request->validate([
+            'umum' => 'required, unique:mapelumum',
+            'mapel' => 'required',
+            'durasi' => 'required',
+        ]);
+        // IF NOT VALIDATE RETURN WITH FLASH MESSAGE
+        if($message){
+            return redirect('/mapel-umum')->with('danger', $message);
+        }
+
         DB::table('mapelumum')
               ->where('id', '=', $request->id)
               ->update([
