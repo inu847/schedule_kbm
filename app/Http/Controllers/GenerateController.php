@@ -338,9 +338,27 @@ class GenerateController extends Controller
         $dataGenerate = [];
         $count_result_generate_kelas = count($result_generate_kelas) - 1;
         $index_result_generate_kelas = 0;
+        $kelas_now = null;
+        $day_now = null;
+        $count_same_day_class = 1;
 
         foreach ($result_generate_kelas as $key => $value) {
             foreach ($data as $hkey => $detail) {
+                // CHECK IS DATA GENERATE IN ONE DAY AND CLASS IF MAPEL SAME > 4 IN ONE DAY REDECLARATION MAPEL SAME IN ONE DAY
+                if ($kelas_now == $value['kelas'] && $day_now == $detail['hari']) {
+                    if ($count_same_day_class >= 4) {
+                        $detail['kode_mapel'] = $data[$hkey - $count_same_day_class]['kode_mapel'];
+                        $detail['mapel'] = $data[$hkey - $count_same_day_class]['mapel'];
+                        $detail['durasi'] = $data[$hkey - $count_same_day_class]['durasi'];
+                    }else{
+                        $count_same_day_class++;
+                    }
+                }else{
+                    $kelas_now = $value['kelas'];
+                    $day_now = $detail['hari'];
+                    $count_same_day_class = 1;
+                }
+                
                 $result = [
                     'hari' => $detail['hari'] ?? '-',
                     'waktu' => $detail['waktu'] ?? '-',
@@ -361,9 +379,7 @@ class GenerateController extends Controller
                 }
             }
         }
-
-
-        // dd($dataGenerate);
+    
         return $dataGenerate;
     }
 

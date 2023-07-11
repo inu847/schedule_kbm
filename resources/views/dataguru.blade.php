@@ -70,8 +70,8 @@
               <input type="text" class="form-control" id="nama_guru_edit" value="{{ $guru->nama_guru }}" name="nama_guru">
             </div>
             <div class="mb-3">
-              <label for="exampleInputPassword1" class="form-label">jabatan</label>
-              <input type="text" class="form-control" value="{{ $guru->jabatan }}" name="jabatan">
+              <label for="exampleInputPassword1" class="form-label">Jabatan</label>
+              <input type="text" class="form-control" value="{{ $guru->jabatan }}" name="jabatan" disabled>
             </div>
             <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label">Mapel</label>
