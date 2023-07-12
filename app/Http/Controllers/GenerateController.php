@@ -442,7 +442,25 @@ class GenerateController extends Controller
                     $kelas = $data[$sorting - $max_mapel_per_hari]['kelas'];
                     $mapel = $data[$sorting - $max_mapel_per_hari]['mapel'];
                     $nama_guru = $data[$sorting - $max_mapel_per_hari]['nama_guru'];
-                    // dd($data, $data[$sorting - $max_mapel_per_hari-1]['kode_mapel']);
+                    $ruang_repeat = $data[$sorting - $max_mapel_per_hari]['ruang'];
+                    // ADD ARRAY TO DATA
+                    $result = [
+                        'hari' => $day[$index_hari_sekarang],
+                        'waktu' => $waktu_mulai_mapel->format('H:i') . ' - ' . $waktu_berakhir_mapel->addMinutes($durasi)->format('H:i'),
+                        'kode_mapel' => $kode_mapel,
+                        'mapel' => $mapel,
+                        'durasi' => $durasi,
+                        'nama_guru' => $nama_guru,
+                        'kelas' => $kelas,
+                        'ruang' => $ruang_repeat,
+                    ];
+
+                    array_push($data, $result);
+
+                    // REPEAT LOOPING DATAGURU -1 
+                    if ($key1 > 0) {
+                        $key1--;
+                    }
                 }else{
                     $kode_mapel = $mapel_find->kode_umum ?? $mapel_find->kode_agama;
                     $durasi = $mapel_find->durasi;
@@ -538,10 +556,48 @@ class GenerateController extends Controller
                 unset($data[$key]);
             }
         }
+
+        
+        $result = [];
+        // GROUP BY KELAS AND DURASI
+        $group_by_kelas = collect($data)->groupBy('kelas')->toArray();
+        // GENERATE AGAIN DATA WITH RANDOM MAPEL IF DURASI SAME
+        foreach ($group_by_kelas as $key => $value) {
+            foreach ($value as $key1 => $value1) {
+                $mapel_random = collect($data)->where('kelas', $value1['kelas'])->where('durasi', $value1['durasi'])->random();
+
+                $mapel = $mapel_random['mapel'] ?? null;
+                $durasi = $value1['durasi'];
+                $nama_guru = DataGuru::where('kelas', $value1['kelas'])->where('code_mapel', $mapel_random['kode_mapel'])->first()->nama_guru ?? null;
+                $kelas = $value1['kelas'];
+                $ruang_repeat = $value1['ruang'];
+                $waktu_mulai_mapel = Carbon::parse(explode('-', $value1['waktu'])[0]);
+                $waktu_berakhir_mapel = Carbon::parse(explode('-', $value1['waktu'])[1]);
+                $sorting = $value1['sorting'] ?? null;
+                $index_hari_sekarang = $value1['number_day'] ?? null;
+                $kode_mapel = $mapel_random['kode_mapel'];
+                $hari = $value1['hari'] ?? null;
+                $result_generate2 = [
+                    'number_day' => $index_hari_sekarang,
+                    'hari' => $hari,
+                    'waktu' => $waktu_mulai_mapel->format('H:i') . '-' . $waktu_berakhir_mapel->format('H:i'),
+                    'kode_mapel' => $kode_mapel,
+                    'kelas' => $kelas ?? '-',
+                    'mapel' => $mapel,
+                    'nama_guru' => $nama_guru,
+                    'durasi' => $durasi,
+                    'sorting' => $sorting,
+                    'ruang' => $ruang_repeat,
+                ];
+
+                array_push($result, $result_generate2);
+            }
+        }
+        
         // SORTING NUMBER DAY AND SORTING
-        $data = collect($data)->sortBy('number_day')->sortBy('sorting')->toArray();
+        $result = collect($result)->sortBy('number_day')->sortBy('sorting')->toArray();
         
         // dd($data);
-        return $data;
+        return $result;
     }
 }
