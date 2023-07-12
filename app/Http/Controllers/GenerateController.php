@@ -405,8 +405,8 @@ class GenerateController extends Controller
         $data = [];
         $no = 1;
         $sorting = 1;
-        $waktu_mulai_mapel = Carbon::parse('07:00');
-        $waktu_berakhir_mapel = Carbon::parse('07:00');
+        $waktu_mulai_mapel = Carbon::parse('08:00');
+        $waktu_berakhir_mapel = Carbon::parse('08:00');
         $waktu_selesai_kbm = Carbon::parse('12:00');
         $matapelajaran = DataGuru::whereNotIn('code_mapel', ['PJOK', 'PRAMUKA'])->whereNotNull('kelas')->orderBy('kelas', 'asc')->get();
         $index_hari_sekarang = 0;
@@ -415,6 +415,7 @@ class GenerateController extends Controller
         $max_mapel_per_hari = 3;
         $index_mapel_per_hari = 0;
         $status_mapel_lebih_max = false;
+        $time_not_found = Waktu::get();
         // GENERATE DATA WITH RULE 1
         // JAM PELAJARAN JAM 07:00 - 14:00 MENAMBAHKAN JAM SESUAI DURASI MAPEL YANG DIAMBIL
         foreach ($matapelajaran as $key1 => $guru) {
@@ -452,8 +453,8 @@ class GenerateController extends Controller
 
                 // STATMENT IF WAKTU BERAKHIR MAPEL > WAKTU SELESAI KBM
                 if ($waktu_berakhir_mapel >= $waktu_selesai_kbm) {
-                    $waktu_mulai_mapel = Carbon::parse('07:00');
-                    $waktu_berakhir_mapel = Carbon::parse('07:00');
+                    $waktu_mulai_mapel = Carbon::parse('08:00');
+                    $waktu_berakhir_mapel = Carbon::parse('08:00');
 
                     // SWITCH DAY
                     $index_hari_sekarang++;
@@ -462,8 +463,30 @@ class GenerateController extends Controller
                     }
                 }else{
                     // ADD TIME
-                    $waktu_mulai_mapel = $waktu_berakhir_mapel;
-                    $waktu_berakhir_mapel = $waktu_mulai_mapel->addMinutes($durasi);
+                    $waktu_berakhir_mapel->addMinutes($durasi);
+                }
+
+                // CHECK TIME IS NOT AVAILABLE
+                foreach ($time_not_found as $tkey => $time) {
+                    $start_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[0]);
+                    $end_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[1]);
+                    $update_berakhir = Carbon::parse(explode('-', $time->waktu)[1]);
+                    if ($time->hari == $day[$index_hari_sekarang]) {
+                        // IF TIME NOW IN RANGE TIME NOT FOUND UPDATE START TIME AND END TIME
+                        if ($waktu_berakhir_mapel->between($start_time_not_available_in_days, $end_time_not_available_in_days)) {
+                            $waktu_mulai_mapel = $end_time_not_available_in_days;
+                            // GETTING RANGE MINUTE IN start_time_not_available_in_days end_time_not_available_in_days
+                            $range_minute = $start_time_not_available_in_days->diffInMinutes($end_time_not_available_in_days);
+                            // ADD TIME
+                            $waktu_berakhir_mapel->addMinutes($range_minute);
+                            // dd($waktu_mulai_mapel, $waktu_berakhir_mapel);
+                        }
+                    }
+                }
+
+                // IF TIME SAME ADD END REDESCRIPTION MINUTE
+                if ($waktu_mulai_mapel == $waktu_berakhir_mapel) {
+                    $waktu_berakhir_mapel->addMinutes($durasi);
                 }
 
                 // PJOK, PRAMUKA DI HARI SABTU
@@ -475,7 +498,7 @@ class GenerateController extends Controller
                         $nama_guru = DataGuru::where('kelas', $guru->kelas)->where('code_mapel', 'PJOK')->first()->nama_guru ?? null;
                     }elseif ($waktu_mulai_mapel >= Carbon::parse('11:00')) {
                         $kode_mapel = 'PRAMUKA';
-                        $mapel = 'PRAMUKA';
+                        $mapel = 'PRMAUKA';
                         $durasi = 60;
                         $nama_guru = DataGuru::where('kelas', $guru->kelas)->where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
                     }
@@ -495,7 +518,8 @@ class GenerateController extends Controller
                 ];
 
                 array_push($data, $result);
-
+                // UPDATE START TIME
+                $waktu_mulai_mapel->addMinutes($durasi);
                 $sorting++;
                 // SWITCH RUANG
                 $index_data_ruangan++;
