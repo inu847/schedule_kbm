@@ -17,5 +17,6 @@ class DataGuru extends Model
         'jabatan',
         'mapel',
         'no_hp',
+        'kelas',
     ];
 }

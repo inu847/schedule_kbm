@@ -143,8 +143,9 @@ class GenerateController extends Controller
             }
         }
 
-        $generate_waktu = $this->generateWaktu($mapel);
-        $result_generate = $this->generateKelas($generate_waktu);
+        $result_generate = $this->generateAll($mapel);
+        // $generate_waktu = $this->generateWaktu($mapel);
+        // $result_generate = $this->generateKelas($generate_waktu);
 
         foreach ($result_generate as $key => $data) {
             $create = Generate::create($data);
@@ -188,9 +189,6 @@ class GenerateController extends Controller
                     break;
                 }
 
-                // fungsi explode
-                // '08:30', '09:00'
-                // ['08:30', '09:00']
                 foreach ($time_not_found as $tkey => $time) {
                     $start_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[0]);
                     $end_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[1]);
@@ -391,5 +389,135 @@ class GenerateController extends Controller
         }
 
         return redirect()->back()->with('success', 'Data berhasil dihapus');
+    }
+
+    public function generateAll($mapel)
+    {  
+        $day = [
+            'Senin', 
+            'Selasa',
+            'Rabu',
+            'Kamis',
+            'Jumat',
+            'Sabtu',
+        ];
+        
+        $data = [];
+        $no = 1;
+        $sorting = 1;
+        $waktu_mulai_mapel = Carbon::parse('07:00');
+        $waktu_berakhir_mapel = Carbon::parse('07:00');
+        $waktu_selesai_kbm = Carbon::parse('12:00');
+        $matapelajaran = DataGuru::whereNotIn('code_mapel', ['PJOK', 'PRAMUKA'])->whereNotNull('kelas')->orderBy('kelas', 'asc')->get();
+        $index_hari_sekarang = 0;
+        $ruang = DataRuangan::InrandomOrder()->get();
+        $index_data_ruangan = 0;
+        $max_mapel_per_hari = 3;
+        $index_mapel_per_hari = 0;
+        $status_mapel_lebih_max = false;
+        // GENERATE DATA WITH RULE 1
+        // JAM PELAJARAN JAM 07:00 - 14:00 MENAMBAHKAN JAM SESUAI DURASI MAPEL YANG DIAMBIL
+        foreach ($matapelajaran as $key1 => $guru) {
+            // FIND MAPEL
+            $mapel_find = MapelUmum::where('kode_umum', $guru->code_mapel)->first() ?? 
+                            MapelAgama::where('kode_agama', $guru->code_mapel)->first();
+            
+            if ($mapel_find) {
+                // STATMENT MAX MAPEL PER HARI
+                if ($index_mapel_per_hari >= $max_mapel_per_hari) {
+                    $status_mapel_lebih_max = true;
+                    if ($waktu_berakhir_mapel >= $waktu_selesai_kbm) {
+                        $index_mapel_per_hari = 0;
+                    }
+                }else{
+                    $status_mapel_lebih_max = false;
+                    $index_mapel_per_hari++;
+                }
+                
+                if ($status_mapel_lebih_max == true) {
+                    // GET MAPEL IN FIST DAY AGAIN
+                    $kode_mapel = $data[$sorting - $max_mapel_per_hari]['kode_mapel'];
+                    $durasi = $data[$sorting - $max_mapel_per_hari]['durasi'];
+                    $kelas = $data[$sorting - $max_mapel_per_hari]['kelas'];
+                    $mapel = $data[$sorting - $max_mapel_per_hari]['mapel'];
+                    $nama_guru = $data[$sorting - $max_mapel_per_hari]['nama_guru'];
+                    // dd($data, $data[$sorting - $max_mapel_per_hari-1]['kode_mapel']);
+                }else{
+                    $kode_mapel = $mapel_find->kode_umum ?? $mapel_find->kode_agama;
+                    $durasi = $mapel_find->durasi;
+                    $kelas = $guru->kelas;
+                    $mapel = $guru->mapel;
+                    $nama_guru = $guru->nama_guru;
+                }
+
+                // STATMENT IF WAKTU BERAKHIR MAPEL > WAKTU SELESAI KBM
+                if ($waktu_berakhir_mapel >= $waktu_selesai_kbm) {
+                    $waktu_mulai_mapel = Carbon::parse('07:00');
+                    $waktu_berakhir_mapel = Carbon::parse('07:00');
+
+                    // SWITCH DAY
+                    $index_hari_sekarang++;
+                    if ($index_hari_sekarang > 5) {
+                        $index_hari_sekarang = 0;
+                    }
+                }else{
+                    // ADD TIME
+                    $waktu_mulai_mapel = $waktu_berakhir_mapel;
+                    $waktu_berakhir_mapel = $waktu_mulai_mapel->addMinutes($durasi);
+                }
+
+                // PJOK, PRAMUKA DI HARI SABTU
+                if ($day[$index_hari_sekarang] == 'Sabtu') {
+                    if ($waktu_mulai_mapel >= Carbon::parse('10:00') && $waktu_mulai_mapel < Carbon::parse('11:00') ) {
+                        $kode_mapel = 'PJOK';
+                        $mapel = 'PJOK';
+                        $durasi = 60;
+                        $nama_guru = DataGuru::where('kelas', $guru->kelas)->where('code_mapel', 'PJOK')->first()->nama_guru ?? null;
+                    }elseif ($waktu_mulai_mapel >= Carbon::parse('11:00')) {
+                        $kode_mapel = 'PRAMUKA';
+                        $mapel = 'PRAMUKA';
+                        $durasi = 60;
+                        $nama_guru = DataGuru::where('kelas', $guru->kelas)->where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
+                    }
+                }
+
+                $result = [
+                    'number_day' => $index_hari_sekarang,
+                    'hari' => $day[$index_hari_sekarang],
+                    'waktu' => $waktu_mulai_mapel->format('H:i') . '-' . $waktu_berakhir_mapel->format('H:i'),
+                    'kode_mapel' => $kode_mapel,
+                    'kelas' => $kelas ?? '-',
+                    'mapel' => $mapel,
+                    'nama_guru' => $nama_guru,
+                    'durasi' => $durasi,
+                    'sorting' => $sorting,
+                    'ruang' => $ruang[$index_data_ruangan]->ruang,
+                ];
+
+                array_push($data, $result);
+
+                $sorting++;
+                // SWITCH RUANG
+                $index_data_ruangan++;
+                if ($index_data_ruangan >= $ruang->count()) {
+                    $index_data_ruangan = 0;
+                }
+            }
+        }
+
+        // CHECK DATA IF END TIME > END TIME KBM
+        foreach ($data as $key => $value) {
+            // MENGAMBIL DATA ENDTIME IN WAKTU
+            $waktu_berakhir = explode('-', $value['waktu'])[1];
+            // IF WAKTU BERAKHIR > WAKTU SELESAI KBM THEN REMOVE DATA
+            if (Carbon::parse($waktu_berakhir) > $waktu_selesai_kbm) {
+                unset($data[$key]);
+            }
+        }
+        // SORTING NUMBER DAY AND SORTING
+        $data = collect($data)->sortBy('number_day')->sortBy('sorting')->toArray();
+        
+        // dd($data);
+        return $data;
     }
 }
