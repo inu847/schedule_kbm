@@ -143,7 +143,10 @@ class GenerateController extends Controller
             }
         }
 
+        // RULE BARU
         $result_generate = $this->generateAll($mapel);
+
+        // RULE LAMA
         // $generate_waktu = $this->generateWaktu($mapel);
         // $result_generate = $this->generateKelas($generate_waktu);
 

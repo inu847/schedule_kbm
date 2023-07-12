@@ -12,7 +12,7 @@ class GuruController extends Controller
 {
     function index() {
         $guru = DB::table('dataguru')
-            ->select('id', 'nama_guru','jabatan','mapel','no_hp', 'code_mapel')
+            ->select('id', 'nama_guru','jabatan','mapel','no_hp', 'code_mapel', 'kelas')
             ->get();
         $mapel = MapelUmum::whereNotNull('kode_umum')->union(MapelAgama::whereNotNull('kode_agama'))->get();
         foreach ($mapel as $key => $value) {

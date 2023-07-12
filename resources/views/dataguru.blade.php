@@ -112,6 +112,7 @@
           <th scope="col">Nama Guru</th>
           <th scope="col">Jabatan</th>
           <th scope="col">Mapel</th>
+          <th scope="col">Pengampu Kelas</th>
           <th scope="col">Nomor HP</th>
           <th scope="col">Aksi</th>
         </tr>
@@ -122,6 +123,7 @@
                 <td>{{ $key + 1 }}</td>
                 <td>{{ $guru->nama_guru }}</td>
                 <td>{{ $guru->jabatan }}</td>
+                <td>{{ $guru->kelas }}</td>
                 <td>{{ $guru->mapel }}</td>
                 <td>{{ $guru->no_hp }}</td>
                 <td>
