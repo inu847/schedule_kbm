@@ -144,10 +144,10 @@ class GenerateController extends Controller
         }
 
         // RULE BARU
-        $result_generate = $this->generateAll($mapel);
+        // $result_generate = $this->generateAll($mapel);
 
         // RULE LAMA
-        // $generate_waktu = $this->generateWaktu($mapel);
+        $result_generate = $this->generateWaktu($mapel);
         // $result_generate = $this->generateKelas($generate_waktu);
 
         foreach ($result_generate as $key => $data) {
@@ -178,10 +178,22 @@ class GenerateController extends Controller
         $no = 0;
         $index_mapel_check = 0;
         $max_mapel = count($mapel) - 1;
+        $ruang = DataRuangan::InRandomOrder()->get();
+        $index_data_ruangan = 0;
 
         foreach ($dayOfWeek as $key => $day) {
             $sorting = 1;
             foreach ($mapel as $value) {
+                $kode_mapel = $mapel[$index_mapel_check]->kode_umum ?? $mapel[$index_mapel_check]->kode_agama;
+                $nama_mapel = $mapel[$index_mapel_check]->mapel;
+                $data_g = DataGuru::where('code_mapel', $kode_mapel)->first() ?? null;
+                $nama_guru = $data_g->nama_guru ?? null;
+                $kelas = $data_g->kelas ?? null;
+                
+                if (!$data_g) {
+                    continue;
+                }
+
                 $not_avaliabe_time_start = '';
                 $not_avaliabe_time_end = '';
                 
@@ -226,8 +238,6 @@ class GenerateController extends Controller
                 $waktu_mulai = $waktu_mulai->subMinutes($value->durasi);
                 $waktu_kbm = $waktu_mulai->format('H:i') . '-' . $waktu_selesai->format('H:i');
                 
-                $kode_mapel = null;
-                $nama_mapel = null;
                 for ($i=0; $i < $max_mapel; $i++) { 
                     if ($mapel[$i]->durasi == $value->durasi) {                        
                         if ($index_mapel_check < $max_mapel) {
@@ -239,10 +249,6 @@ class GenerateController extends Controller
                         break;
                     }
                 }
-
-                $kode_mapel = $mapel[$index_mapel_check]->kode_umum ?? $mapel[$index_mapel_check]->kode_agama;
-                $nama_mapel = $mapel[$index_mapel_check]->mapel;
-                $nama_guru = DataGuru::where('code_mapel', $kode_mapel)->first()->nama_guru ?? null;
 
                 // PJOK, PRAMUKA DI HARI SABTU
                 if ($day == 'Sabtu') {
@@ -267,122 +273,128 @@ class GenerateController extends Controller
                     'kode_mapel' => $kode_mapel,
                     'mapel' => $nama_mapel,
                     'durasi' => $value->durasi,
-                    'kelas' => null,
-                    'ruang' => null,
+                    'kelas' => $kelas,
+                    'ruang' => $ruang[$index_data_ruangan]->ruang ?? null,
                     'nama_guru' => $nama_guru,
                 ];
 
                 $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
                 $no++;
                 $sorting++;
+
+                if ($index_data_ruangan < count($ruang)) {
+                    $index_data_ruangan++;
+                }else {
+                    $index_data_ruangan = 0;
+                }
             }
         }
 
         // dd($data);
         
         // RULE 2
-        foreach ($data as $key => $value) {
-            $time_start = explode('-', $value['waktu'])[0];
-            $time_start_kbm = Carbon::parse($time_start);
-            $time_end = explode('-', $value['waktu'])[1];
-            $time_end_kbm = Carbon::parse($time_end);
+        // foreach ($data as $key => $value) {
+        //     $time_start = explode('-', $value['waktu'])[0];
+        //     $time_start_kbm = Carbon::parse($time_start);
+        //     $time_end = explode('-', $value['waktu'])[1];
+        //     $time_end_kbm = Carbon::parse($time_end);
 
-            if ($this->end_kbm < $time_end_kbm) {
-                $guru = DataGuru::pluck('code_mapel');
-                $mapel_pengganti = MapelAgama::where('durasi', 30)->whereIn('kode_agama', $guru)
-                                    ->union(MapelUmum::where('durasi', 30)->whereIn('kode_umum', $guru))
-                                    ->inRandomOrder()
-                                    ->first();
-                $dataGuru = DataGuru::where('code_mapel', $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum)->first();
-                $data[$key]['kode_mapel'] = $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum;
-                $data[$key]['mapel'] = $mapel_pengganti->mapel ?? null;
-                $data[$key]['durasi'] = $mapel_pengganti->durasi ?? null;
-                $data[$key]['nama_guru'] = $dataGuru->nama_guru ?? null;
-                $first_time = explode('-', $data[$key]['waktu'])[0];
-                $last_time = explode('-', $data[$key]['waktu'])[1];
-                $last_time = Carbon::parse($last_time)->subMinutes($mapel_pengganti->durasi)->format('H:i');
-                $data[$key]['waktu'] = $first_time . '-' . $last_time;
-            }
+        //     if ($this->end_kbm < $time_end_kbm) {
+        //         $guru = DataGuru::pluck('code_mapel');
+        //         $mapel_pengganti = MapelAgama::where('durasi', 30)->whereIn('kode_agama', $guru)
+        //                             ->union(MapelUmum::where('durasi', 30)->whereIn('kode_umum', $guru))
+        //                             ->inRandomOrder()
+        //                             ->first();
+        //         $dataGuru = DataGuru::where('code_mapel', $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum)->first();
+        //         $data[$key]['kode_mapel'] = $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum;
+        //         $data[$key]['mapel'] = $mapel_pengganti->mapel ?? null;
+        //         $data[$key]['durasi'] = $mapel_pengganti->durasi ?? null;
+        //         $data[$key]['nama_guru'] = $dataGuru->nama_guru ?? null;
+        //         $first_time = explode('-', $data[$key]['waktu'])[0];
+        //         $last_time = explode('-', $data[$key]['waktu'])[1];
+        //         $last_time = Carbon::parse($last_time)->subMinutes($mapel_pengganti->durasi)->format('H:i');
+        //         $data[$key]['waktu'] = $first_time . '-' . $last_time;
+        //     }
 
-            if ($this->end_kbm <= $time_start_kbm) {
-                unset($data[$key]);
-            }
-        }
+        //     if ($this->end_kbm <= $time_start_kbm) {
+        //         unset($data[$key]);
+        //     }
+        // }
 
         $data = collect($data)->sortBy('number_day')->toArray();
 
         return $data;
     }
 
-    public function generateKelas($data)
-    {
-        $data_kelas = DataKelas::orderBy('kelas', 'asc')->get();
-        $data_ruangan = DataRuangan::orderBy('ruang', 'asc')->get();
-        $data_guru = DataGuru::orderBy('id', 'asc')->get();
+    // public function generateKelas($data)
+    // {
+    //     $data_kelas = DataKelas::orderBy('kelas', 'asc')->get();
+    //     $data_ruangan = DataRuangan::orderBy('ruang', 'asc')->get();
+    //     $data_guru = DataGuru::orderBy('id', 'asc')->get();
 
-        $result_generate_kelas = [];
-        $index_data_ruangan = 0;
-        $no = 0;
-        foreach ($data_kelas as $kelas) {
-            $result_kelas = [
-                'kelas' => $kelas->kelas,
-                'ruang' => $data_ruangan[$index_data_ruangan]->ruang,
-            ];
-            array_push($result_generate_kelas, $result_kelas);
-            if ($index_data_ruangan < $data_ruangan->count()) {
-                $index_data_ruangan ++;
-            }else{
-                $index_data_ruangan = 0;
-            }
-        }
+    //     $result_generate_kelas = [];
+    //     $index_data_ruangan = 0;
+    //     $no = 0;
+    //     foreach ($data_kelas as $kelas) {
+    //         $result_kelas = [
+    //             'kelas' => $kelas->kelas,
+    //             'ruang' => $data_ruangan[$index_data_ruangan]->ruang,
+    //         ];
+    //         array_push($result_generate_kelas, $result_kelas);
+    //         if ($index_data_ruangan < $data_ruangan->count()) {
+    //             $index_data_ruangan ++;
+    //         }else{
+    //             $index_data_ruangan = 0;
+    //         }
+    //     }
 
-        $dataGenerate = [];
-        $count_result_generate_kelas = count($result_generate_kelas) - 1;
-        $index_result_generate_kelas = 0;
-        $kelas_now = null;
-        $day_now = null;
-        $count_same_day_class = 1;
+    //     $dataGenerate = [];
+    //     $count_result_generate_kelas = count($result_generate_kelas) - 1;
+    //     $index_result_generate_kelas = 0;
+    //     $kelas_now = null;
+    //     $day_now = null;
+    //     $count_same_day_class = 1;
 
-        foreach ($result_generate_kelas as $key => $value) {
-            foreach ($data as $hkey => $detail) {
-                // CHECK IS DATA GENERATE IN ONE DAY AND CLASS IF MAPEL SAME > 4 IN ONE DAY REDECLARATION MAPEL SAME IN ONE DAY
-                if ($kelas_now == $value['kelas'] && $day_now == $detail['hari']) {
-                    if ($count_same_day_class >= 4) {
-                        $detail['kode_mapel'] = $data[$hkey - $count_same_day_class]['kode_mapel'];
-                        $detail['mapel'] = $data[$hkey - $count_same_day_class]['mapel'];
-                        $detail['durasi'] = $data[$hkey - $count_same_day_class]['durasi'];
-                    }else{
-                        $count_same_day_class++;
-                    }
-                }else{
-                    $kelas_now = $value['kelas'];
-                    $day_now = $detail['hari'];
-                    $count_same_day_class = 1;
-                }
+    //     foreach ($result_generate_kelas as $key => $value) {
+    //         foreach ($data as $hkey => $detail) {
+    //             // CHECK IS DATA GENERATE IN ONE DAY AND CLASS IF MAPEL SAME > 4 IN ONE DAY REDECLARATION MAPEL SAME IN ONE DAY
+    //             if ($kelas_now == $value['kelas'] && $day_now == $detail['hari']) {
+    //                 if ($count_same_day_class >= 4) {
+    //                     $detail['kode_mapel'] = $data[$hkey - $count_same_day_class]['kode_mapel'];
+    //                     $detail['mapel'] = $data[$hkey - $count_same_day_class]['mapel'];
+    //                     $detail['durasi'] = $data[$hkey - $count_same_day_class]['durasi'];
+    //                 }else{
+    //                     $count_same_day_class++;
+    //                 }
+    //             }else{
+    //                 $kelas_now = $value['kelas'];
+    //                 $day_now = $detail['hari'];
+    //                 $count_same_day_class = 1;
+    //             }
                 
-                $result = [
-                    'hari' => $detail['hari'] ?? '-',
-                    'waktu' => $detail['waktu'] ?? '-',
-                    'kode_mapel' => $detail['kode_mapel'] ?? '-',
-                    'mapel' => $detail['mapel'] ?? '-',
-                    'durasi' => $detail['durasi'] ?? '-',
-                    'nama_guru' => $detail['nama_guru'] ?? '-',
-                    'kelas' => $value['kelas'] ?? '-',
-                    'ruang' => $value['ruang'] ?? '-',
-                ];
+    //             $result = [
+    //                 'hari' => $detail['hari'] ?? '-',
+    //                 'waktu' => $detail['waktu'] ?? '-',
+    //                 'kode_mapel' => $detail['kode_mapel'] ?? '-',
+    //                 'mapel' => $detail['mapel'] ?? '-',
+    //                 'durasi' => $detail['durasi'] ?? '-',
+    //                 'nama_guru' => $detail['nama_guru'] ?? '-',
+    //                 'kelas' => $value['kelas'] ?? '-',
+    //                 'ruang' => $value['ruang'] ?? '-',
+    //             ];
                 
-                array_push($dataGenerate, $result);
+    //             array_push($dataGenerate, $result);
     
-                if ($index_result_generate_kelas < $count_result_generate_kelas) {
-                    $index_result_generate_kelas++;
-                }else {
-                    $index_result_generate_kelas = 0;
-                }
-            }
-        }
+    //             if ($index_result_generate_kelas < $count_result_generate_kelas) {
+    //                 $index_result_generate_kelas++;
+    //             }else {
+    //                 $index_result_generate_kelas = 0;
+    //             }
+    //         }
+    //     }
     
-        return $dataGenerate;
-    }
+    //     return $dataGenerate;
+    // }
 
     public function deleteAll()
     {
