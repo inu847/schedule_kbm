@@ -188,11 +188,7 @@ class GenerateController extends Controller
                 $nama_mapel = $mapel[$index_mapel_check]->mapel;
                 $data_g = DataGuru::where('code_mapel', $kode_mapel)->first() ?? null;
                 $nama_guru = $data_g->nama_guru ?? null;
-                $kelas = $data_g->kelas ?? null;
-                
-                if (!$data_g) {
-                    continue;
-                }
+                $kelas = $data_g->kelas ?? dd($kode_mapel);
 
                 $not_avaliabe_time_start = '';
                 $not_avaliabe_time_end = '';
@@ -282,7 +278,7 @@ class GenerateController extends Controller
                 $no++;
                 $sorting++;
 
-                if ($index_data_ruangan < count($ruang)) {
+                if ($index_data_ruangan < (count($ruang) -1)) {
                     $index_data_ruangan++;
                 }else {
                     $index_data_ruangan = 0;
