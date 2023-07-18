@@ -105,40 +105,48 @@ class GenerateController extends Controller
 
     public function generateJadwal($request)
     {
-        $mapel_agama = MapelAgama::orderBy('kode_agama', 'asc')
-                                    ->get();
-
-        $mapel_umum = MapelUmum::orderBy('kode_umum', 'asc')
-                                ->whereNotIn('kode_umum', ['PJOK', 'PRAMUKA'])
-                                    ->get();
+        $dataGuru = DataGuru::orderBy('kelas', 'asc')
+                                ->select('nama_guru', 'kelas', 'code_mapel')
+                                ->whereNotIn('code_mapel', ['PJOK', 'PRAMUKA'])
+                                ->get();
 
         $mapel = [];
         $limit_mapel_agama = (int)generalSetting('mapel_agama')->value;
         $limit_mapel_umum = (int)generalSetting('mapel_umum')->value;
+        $kelas_now = '';
+        $max_mapel_agama = 0;
+        $max_mapel_umum = 0;
 
-        foreach($mapel_agama as $key => $value) {
-            $dataGuru = DataGuru::where('code_mapel', $value->kode_agama)
-                                    ->select('nama_guru')
-                                    ->first();
-            $value->nama_guru = $dataGuru->nama_guru ?? null;
-            if ($value->kode_agama && $limit_mapel_agama >= $key+1) {
-                array_push($mapel, $value);
+        foreach ($dataGuru as $key => $value) {
+            // CHECK MAPEL IS SAME WITH DATA GURU
+            $mapel_check = MapelAgama::where('kode_agama', $value->code_mapel)->first() ?? MapelUmum::where('kode_umum', $value->code_mapel)->first();
+            $result = [
+                'nama_guru' => $value->nama_guru,
+                'kelas' => $value->kelas,
+                'mapel' => $mapel_check->mapel,
+                'code_mapel' => $value->code_mapel,
+                'durasi' => $mapel_check->durasi,
+            ];
+            
+            // CHECK KELAS
+            if ($kelas_now != $value->kelas) {
+                $kelas_now = $value->kelas;
+                $max_mapel_agama = 0;
+                $max_mapel_umum = 0;
             }
-        }
 
-        foreach($mapel_umum as $key => $value) {
-            $dataGuru = DataGuru::where('code_mapel', $value->kode_umum)
-                                    ->select('nama_guru')
-                                    ->first();
-            $value->nama_guru = $dataGuru->nama_guru ?? null;
-            if (isset($dataGuru->nama_guru)) {
-                if ($dataGuru->nama_guru && $limit_mapel_umum >= $key+1) {
-                    array_push($mapel, $value);
-                }
-            }else{
-                $value->nama_guru = null;
-                if ($limit_mapel_umum >= $key+1) {
-                    array_push($mapel, $value);
+            // CHECK MAPEL LIMIT WITH CODE AGAMA BY KELAS
+            if ($kelas_now == $value->kelas) {
+                if ($mapel_check->kode_agama != null) {
+                    if ($max_mapel_agama < $limit_mapel_agama) {
+                        $max_mapel_agama++;
+                        array_push($mapel, $result);
+                    }
+                }else{
+                    if ($max_mapel_umum < $limit_mapel_umum) {
+                        $max_mapel_umum++;
+                        array_push($mapel, $result);
+                    }
                 }
             }
         }
@@ -180,30 +188,45 @@ class GenerateController extends Controller
         $max_mapel = count($mapel) - 1;
         $ruang = DataRuangan::InRandomOrder()->get();
         $index_data_ruangan = 0;
+        $data_kelas = DataKelas::orderBy('kelas', 'asc')->get();
+        $index_day = 0;
+        $kelas_now = $data_kelas[0]->kelas;
 
-        foreach ($dayOfWeek as $key => $day) {
+        foreach ($data_kelas as $key => $kelas) {
             $sorting = 1;
-            foreach ($mapel as $value) {
-                $kode_mapel = $mapel[$index_mapel_check]->kode_umum ?? $mapel[$index_mapel_check]->kode_agama;
-                $nama_mapel = $mapel[$index_mapel_check]->mapel;
-                $data_g = DataGuru::where('code_mapel', $kode_mapel)->first() ?? null;
-                $nama_guru = $data_g->nama_guru ?? null;
-                $kelas = $data_g->kelas ?? dd($kode_mapel);
+            $mapel_in_class = collect($mapel)->where('kelas', $kelas->kelas);
+            if (count($mapel_in_class) < 20) {
+                $mapel_in_class = $mapel_in_class->concat($mapel_in_class)
+                                ->concat($mapel_in_class)
+                                ->concat($mapel_in_class);
+            }
 
+            foreach ($mapel_in_class as $index_mapel => $value) {
                 $not_avaliabe_time_start = '';
                 $not_avaliabe_time_end = '';
                 
+                // IF WAKTU END KBM AND HARI SABTU IS BREAK
+                if ($end_kbm <= $time_now && $dayOfWeek[$index_day] == 'Sabtu') {
+                    $time_now = Carbon::parse('07:00:00');
+                    $waktu_mulai = Carbon::parse('07:00:00');
+                    $waktu_selesai = Carbon::parse('07:00:00');
+                    $index_day = 0;
+                    break;
+                }
+
+                // IF WAJTU END KBM IS CHANGE DAY AND RESET TIME
                 if ($end_kbm <= $time_now) {
                     $time_now = Carbon::parse('07:00:00');
                     $waktu_mulai = Carbon::parse('07:00:00');
                     $waktu_selesai = Carbon::parse('07:00:00');
-                    break;
+                    $index_day++;
                 }
 
+                // WAKTU TIDAK TERSEDIA
                 foreach ($time_not_found as $tkey => $time) {
                     $start_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[0]);
                     $end_time_not_available_in_days = Carbon::parse(explode('-', $time->waktu)[1]);
-                    if ($time->hari == $day) {
+                    if ($time->hari == $dayOfWeek[$index_day]) {
                         if ($time_now >= $start_time_not_available_in_days && $time_now < $end_time_not_available_in_days) {
                             $not_avaliabe_time_start = explode('-', $time->waktu)[0];                   
                             $not_avaliabe_time_end = explode('-', $time->waktu)[1];
@@ -212,69 +235,65 @@ class GenerateController extends Controller
 
                     }
                 }
-                // dd($time_now);
+
+                // ADD WAKTU MULAI AND WAKTU SELESAI MAPEL WITH DURASI
                 $not_avaliabe_time_start = Carbon::parse($not_avaliabe_time_start);
                 $not_avaliabe_time_end = Carbon::parse($not_avaliabe_time_end);
                 
                 if ($time_now >= $not_avaliabe_time_start && $time_now < $not_avaliabe_time_end) {
                     $time_now = Carbon::parse($not_avaliabe_time_end);
-                    $time_now = $time_now->addMinutes($value->durasi);
+                    $time_now = $time_now->addMinutes($value['durasi']);
 
                     $waktu_mulai = Carbon::parse($not_avaliabe_time_end);
-                    $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
+                    $waktu_mulai = $waktu_mulai->addMinutes($value['durasi']);
 
                     $waktu_selesai = Carbon::parse($not_avaliabe_time_end);
-                    $waktu_selesai = $waktu_selesai->addMinutes($value->durasi);
+                    $waktu_selesai = $waktu_selesai->addMinutes($value['durasi']);
                 }else{
-                    $time_now = $time_now->addMinutes($value->durasi);
-                    $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
-                    $waktu_selesai = $waktu_selesai->addMinutes($value->durasi);
+                    $time_now = $time_now->addMinutes($value['durasi']);
+                    $waktu_mulai = $waktu_mulai->addMinutes($value['durasi']);
+                    $waktu_selesai = $waktu_selesai->addMinutes($value['durasi']);
                 }
                 
-                $waktu_mulai = $waktu_mulai->subMinutes($value->durasi);
+                // MERGE TO GET TIME START AND TIME END
+                $waktu_mulai = $waktu_mulai->subMinutes($value['durasi']);
                 $waktu_kbm = $waktu_mulai->format('H:i') . '-' . $waktu_selesai->format('H:i');
-                
-                for ($i=0; $i < $max_mapel; $i++) { 
-                    if ($mapel[$i]->durasi == $value->durasi) {                        
-                        if ($index_mapel_check < $max_mapel) {
-                            $index_mapel_check++;
-                        }else {
-                            $index_mapel_check = 0;
-                        }
-                        
-                        break;
-                    }
-                }
 
                 // PJOK, PRAMUKA DI HARI SABTU
-                if ($day == 'Sabtu') {
+                if ($dayOfWeek[$index_day] == 'Sabtu') {
                     if ($waktu_mulai >= Carbon::parse('10:00') && $waktu_mulai < Carbon::parse('11:00') ) {
-                        $kode_mapel = 'PJOK';
-                        $nama_mapel = 'PJOK';
-                        $value->durasi = 60;
-                        $nama_guru = DataGuru::where('code_mapel', 'PJOK')->first()->nama_guru ?? null;
+                        $value['mapel'] = 'PJOK';
+                        $value['code_mapel'] = 'PJOK';
+                        $value['durasi'] = 60;
+                        $value['nama_guru'] = DataGuru::where('code_mapel', 'PJOK')->first()->nama_guru ?? null;
                     }elseif ($waktu_mulai >= Carbon::parse('11:00')) {
-                        $nama_mapel = 'PRAMUKA';
-                        $nama_mapel = 'PRAMUKA';
-                        $value->durasi = 60;
-                        $nama_guru = DataGuru::where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
+                        $value['mapel'] = 'PRAMUKA';
+                        $value['code_mapel'] = 'PRAMUKA';
+                        $value['durasi'] = 60;
+                        $value['nama_guru'] = DataGuru::where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
                     }
                 }
 
+                // IF DAY SABTU AND END TIME KBM THEN BREAK
+                // if ($dayOfWeek[$index_day] == 'Sabtu' && $waktu_selesai->format('H:i') >= $end_kbm) {
+                //     $index_day = 0;
+                //     break;
+                // }
+
                 $data[$no] = [
-                    'hari' => $day,
+                    'hari' => $dayOfWeek[$index_day],
                     'waktu' => $waktu_kbm,
                     'number_day' => $key+1,
                     'number_sorting' => $sorting,
-                    'kode_mapel' => $kode_mapel,
-                    'mapel' => $nama_mapel,
-                    'durasi' => $value->durasi,
-                    'kelas' => $kelas,
+                    'kode_mapel' => $value['code_mapel'],
+                    'mapel' => $value['mapel'],
+                    'durasi' => $value['durasi'],
+                    'kelas' => $value['kelas'],
                     'ruang' => $ruang[$index_data_ruangan]->ruang ?? null,
-                    'nama_guru' => $nama_guru,
+                    'nama_guru' => $value['nama_guru'],
                 ];
 
-                $waktu_mulai = $waktu_mulai->addMinutes($value->durasi);
+                $waktu_mulai = $waktu_mulai->addMinutes($value['durasi']);
                 $no++;
                 $sorting++;
 
@@ -284,6 +303,8 @@ class GenerateController extends Controller
                     $index_data_ruangan = 0;
                 }
             }
+
+            $index_day = 0;
         }
 
         // dd($data);
