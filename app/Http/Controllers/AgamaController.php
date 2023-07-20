@@ -47,7 +47,7 @@ class AgamaController extends Controller
     function update(Request $request){
         // VALIDATE
         $message = $request->validate([
-            'agama' => 'required, unique:mapelagama',
+            'kode_agama' => 'required, unique:mapelumum,kode_agama,'.$request->id,
             'mapel' => 'required',
             'durasi' => 'required',
         ]);

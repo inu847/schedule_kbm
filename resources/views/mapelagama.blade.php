@@ -128,9 +128,9 @@
         </tr>
       </thead>
       <tbody>
-      @foreach($semua_agama as $agama)
+      @foreach($semua_agama as $key => $agama)
             <tr>
-                <td>{{ $agama->id }}</td>
+                <td>{{ $key + 1 }}</td>
                 <td>{{ $agama->kode_agama }}</td>
                 <td>{{ $agama->mapel }}</td>
                 {{-- <td>{{ $agama->kelas }}</td> --}}

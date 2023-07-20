@@ -78,9 +78,9 @@
         </tr>
       </thead>
       <tbody>
-        @foreach($semua_ruang as $ruang)
+        @foreach($semua_ruang as $key => $ruang)
           <tr>
-            <td>{{ $ruang->id }}</td>
+            <td>{{ $key + 1 }}</td>
             <td>{{ $ruang->ruang }}</td>
             <td><button type="button" class="btn btn-warning"  data-toggle="modal" data-target="#editruang{{ $ruang->id }}"><i class="fas fa-pencil-alt"></i></button>
             <button class="btn btn-danger" onclick="deleteData({{ $ruang->id }})"><i class="fa-solid fa-trash"></i></button>

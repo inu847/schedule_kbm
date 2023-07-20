@@ -128,9 +128,9 @@
         </tr>
       </thead>
       <tbody>
-      @foreach($semua_umum as $umum)
+      @foreach($semua_umum as $key => $umum)
             <tr>
-                <td>{{ $umum->id }}</td>
+                <td>{{ $key + 1 }}</td>
                 <td>{{ $umum->kode_umum }}</td>
                 <td>{{ $umum->mapel }}</td>
                 {{-- <td>{{ $umum->kelas }}</td> --}}

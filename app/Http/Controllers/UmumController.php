@@ -47,7 +47,7 @@ class UmumController extends Controller
     function update(Request $request){
         // VALIDATE
         $message = $request->validate([
-            'umum' => 'required, unique:mapelumum',
+            'kode_umum' => 'required, unique:mapelumum,kode_umum,'.$request->id,
             'mapel' => 'required',
             'durasi' => 'required',
         ]);

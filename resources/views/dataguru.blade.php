@@ -71,7 +71,7 @@
             </div>
             <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label">Jabatan</label>
-              <input type="text" class="form-control" value="{{ $guru->jabatan }}" name="jabatan" disabled>
+              <input type="text" class="form-control" value="{{ $guru->jabatan }}" name="jabatan" readonly>
             </div>
             <div class="mb-3">
               <label for="exampleInputPassword1" class="form-label">Mapel</label>
