@@ -272,13 +272,7 @@ class GenerateController extends Controller
                         $value['durasi'] = 60;
                         $value['nama_guru'] = DataGuru::where('code_mapel', 'PRAMUKA')->first()->nama_guru ?? null;
                     }
-                }
-
-                // IF DAY SABTU AND END TIME KBM THEN BREAK
-                // if ($dayOfWeek[$index_day] == 'Sabtu' && $waktu_selesai->format('H:i') >= $end_kbm) {
-                //     $index_day = 0;
-                //     break;
-                // }
+                }                
 
                 $data[$no] = [
                     'hari' => $dayOfWeek[$index_day],
@@ -307,36 +301,17 @@ class GenerateController extends Controller
             $index_day = 0;
         }
 
-        // dd($data);
-        
-        // RULE 2
-        // foreach ($data as $key => $value) {
-        //     $time_start = explode('-', $value['waktu'])[0];
-        //     $time_start_kbm = Carbon::parse($time_start);
-        //     $time_end = explode('-', $value['waktu'])[1];
-        //     $time_end_kbm = Carbon::parse($time_end);
-
-        //     if ($this->end_kbm < $time_end_kbm) {
-        //         $guru = DataGuru::pluck('code_mapel');
-        //         $mapel_pengganti = MapelAgama::where('durasi', 30)->whereIn('kode_agama', $guru)
-        //                             ->union(MapelUmum::where('durasi', 30)->whereIn('kode_umum', $guru))
-        //                             ->inRandomOrder()
-        //                             ->first();
-        //         $dataGuru = DataGuru::where('code_mapel', $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum)->first();
-        //         $data[$key]['kode_mapel'] = $mapel_pengganti->kode_agama ?? $mapel_pengganti->kode_umum;
-        //         $data[$key]['mapel'] = $mapel_pengganti->mapel ?? null;
-        //         $data[$key]['durasi'] = $mapel_pengganti->durasi ?? null;
-        //         $data[$key]['nama_guru'] = $dataGuru->nama_guru ?? null;
-        //         $first_time = explode('-', $data[$key]['waktu'])[0];
-        //         $last_time = explode('-', $data[$key]['waktu'])[1];
-        //         $last_time = Carbon::parse($last_time)->subMinutes($mapel_pengganti->durasi)->format('H:i');
-        //         $data[$key]['waktu'] = $first_time . '-' . $last_time;
-        //     }
-
-        //     if ($this->end_kbm <= $time_start_kbm) {
-        //         unset($data[$key]);
-        //     }
-        // }
+        // JIKA TERDAPAT GURU YANG SAMA DI HARI YANG SAMA DAN DIJAM YANG SAMA MAKA GANTI JAM PADA MAPEL TERSEBUT SECARA RANDOM
+        foreach ($data as $key => $value) {
+            $same_guru = collect($data)->where('nama_guru', $value['nama_guru'])->where('waktu', $value['waktu'])->where('number_day', $value['number_day'])->count();
+            if ($same_guru > 1) {
+                $mapel_random = collect($mapel)->whereNotIn('code_mapel', [$value['kode_mapel']])->random();
+                // dd($data[$key], $mapel_random);
+                $value['nama_guru'] = $mapel_random['nama_guru'];
+                $value['kode_mapel'] = $mapel_random['code_mapel'];
+                $value['mapel'] = $mapel_random['mapel'];
+            }
+        }
 
         $data = collect($data)->sortBy('number_day')->toArray();
 
