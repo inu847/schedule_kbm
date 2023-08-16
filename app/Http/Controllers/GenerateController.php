@@ -303,13 +303,13 @@ class GenerateController extends Controller
 
         // JIKA TERDAPAT GURU YANG SAMA DI HARI YANG SAMA DAN DIJAM YANG SAMA MAKA GANTI JAM PADA MAPEL TERSEBUT SECARA RANDOM
         foreach ($data as $key => $value) {
-            $same_guru = collect($data)->where('nama_guru', $value['nama_guru'])->where('waktu', $value['waktu'])->where('number_day', $value['number_day'])->count();
+            $same_guru = collect($data)->where('nama_guru', $value['nama_guru'])->where('waktu', $value['waktu'])->where('hari', $value['hari'])->count();
             if ($same_guru > 1) {
-                $mapel_random = collect($mapel)->whereNotIn('code_mapel', [$value['kode_mapel']])->random();
-                // dd($data[$key], $mapel_random);
-                $value['nama_guru'] = $mapel_random['nama_guru'];
-                $value['kode_mapel'] = $mapel_random['code_mapel'];
-                $value['mapel'] = $mapel_random['mapel'];
+                $mapel_random = collect($mapel)->whereNotIn('code_mapel', [$value['kode_mapel']])->whereNotIn('nama_guru', [$value['nama_guru']])->random();
+
+                $data[$key]['nama_guru'] = $mapel_random['nama_guru'];
+                $data[$key]['kode_mapel'] = $mapel_random['code_mapel'];
+                $data[$key]['mapel'] = $mapel_random['mapel'];
             }
         }
 
